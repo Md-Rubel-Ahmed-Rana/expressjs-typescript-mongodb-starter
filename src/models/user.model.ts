@@ -17,6 +17,12 @@ const userSchema = new Schema<IUser>(
       trim: true,
       match: [emailRegX, "Please fill a valid email address"],
     },
+    role: {
+      type: String,
+      lowercase: true,
+      default: "user",
+      enum: ["user", "admin", "super admin"],
+    },
     password: {
       type: String,
       required: true,

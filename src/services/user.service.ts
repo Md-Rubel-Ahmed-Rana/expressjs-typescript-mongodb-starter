@@ -3,6 +3,7 @@ import {
   GetUser,
   LoginUser,
   PostUser,
+  UpdateUser,
   UserProjection,
 } from "../interfaces/user.interface";
 import { User } from "../models/user.model";
@@ -31,6 +32,7 @@ class Service {
     const payload = {
       userId: user._id,
       email: user.email,
+      role: user.role,
     };
     const accessToken = jwt.sign(payload, config.jwt.accessTokenSecret, {
       expiresIn: config.jwt.accessTokenExpire,
@@ -96,9 +98,24 @@ class Service {
     return users;
   }
 
-  async findSingleUserById(userId: string) {
+  async findSingleUserById(userId: string): Promise<GetUser | null> {
     const user = await User.findById(userId).select(UserProjection);
     return user;
+  }
+
+  async updateUser(userId: string, updatedData: UpdateUser): Promise<GetUser> {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: { ...updatedData },
+      },
+      { upsert: true, new: true }
+    ).select(UserProjection);
+    return updatedUser;
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await User.findByIdAndDelete(userId);
   }
 }
 

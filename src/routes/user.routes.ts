@@ -3,6 +3,7 @@ import { UserController } from "../controllers/user.controller";
 import { JwtMiddleware } from "../middlewares/JwtMiddleware";
 import validateRequest from "../middlewares/validateRequest";
 import { userValidationSchema } from "../validators/user.validator";
+import checkAuthorization from "../middlewares/authorizeMiddleware";
 
 const router = Router();
 
@@ -56,5 +57,18 @@ router.get("/auth", JwtMiddleware.authenticate, UserController.auth);
 router.get("/", UserController.findUsers);
 
 router.get("/single/:id", UserController.findSingleUserById);
+
+router.patch(
+  "/update/:id",
+  checkAuthorization("user", "admin", "super admin"),
+  validateRequest(userValidationSchema.updateUserSchema),
+  UserController.updateUser
+);
+
+router.delete(
+  "/delete/:id",
+  checkAuthorization("admin", "super admin"),
+  UserController.deleteUser
+);
 
 export const UserRoutes = router;

@@ -93,6 +93,40 @@ class Controller {
         .json({ success: false, message: "Failed to retrieve user data" });
     }
   }
+
+  async updateUser(req: Request, res: Response) {
+    try {
+      const userId = req.params.id;
+      const result = await UserService.updateUser(userId, req.body);
+      res.status(200).json({
+        success: true,
+        message: "User updated successfully!",
+        data: result,
+      });
+    } catch (error) {
+      logger.error(`Error updating user data: ${error}`);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to update user data" });
+    }
+  }
+
+  async deleteUser(req: Request, res: Response) {
+    try {
+      const userId = req.params.id;
+      await UserService.deleteUser(userId);
+      res.status(200).json({
+        success: true,
+        message: "User deleted successfully!",
+        data: null,
+      });
+    } catch (error) {
+      logger.error(`Error deleting user data: ${error}`);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to deleting user data" });
+    }
+  }
 }
 
 export const UserController = new Controller();
