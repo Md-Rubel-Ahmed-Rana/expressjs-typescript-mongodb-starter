@@ -10,6 +10,7 @@ import swaggerUi from "swagger-ui-express";
 import fs from "fs";
 import path from "path";
 import { swaggerSpec } from "./config/apiDoc.swagger";
+import handleZodValidationError from "./errors/validationError";
 
 dotenv.config();
 
@@ -46,16 +47,24 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  logger.error(
-    `${err.status || 500} - ${err.message} - ${req.originalUrl} - ${
-      req.method
-    } - ${req.ip}`
-  );
-  res.status(err.status || 500).json({
-    error: {
-      message: err.message,
-    },
-  });
+  if (err.name === "ZodError") {
+    const errors = handleZodValidationError(err);
+    res.status(err.status || 500).json({
+      message: "Validation error. Invalid data provided",
+      errors,
+    });
+  } else {
+    logger.error(
+      `${err.status || 500} - ${err.message} - ${req.originalUrl} - ${
+        req.method
+      } - ${req.ip}`
+    );
+    res.status(err.status || 500).json({
+      error: {
+        message: err.message,
+      },
+    });
+  }
 });
 
 export default app;

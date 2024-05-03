@@ -60,13 +60,15 @@ router.get("/single/:id", UserController.findSingleUserById);
 
 router.patch(
   "/update/:id",
-  checkAuthorization("user", "admin", "super admin"),
+  JwtMiddleware.authenticate,
+  checkAuthorization("admin", "super admin"),
   validateRequest(userValidationSchema.updateUserSchema),
   UserController.updateUser
 );
 
 router.delete(
   "/delete/:id",
+  JwtMiddleware.authenticate,
   checkAuthorization("admin", "super admin"),
   UserController.deleteUser
 );

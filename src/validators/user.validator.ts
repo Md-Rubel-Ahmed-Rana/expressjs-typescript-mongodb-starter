@@ -7,7 +7,7 @@ const postUserSchema = Zod.object({
       required_error: "Name is required",
     })
       .min(3, "Name must have 3 characters or more")
-      .max(15, "Name must have 15 characters or less"),
+      .max(25, "Name must have 25 characters or less"),
     email: Zod.string({
       invalid_type_error: "Email must be string",
       required_error: "Email is required",
@@ -30,12 +30,12 @@ const updateUserSchema = Zod.object({
       invalid_type_error: "Name must be string",
     })
       .min(3, "Name must have 3 characters or more")
-      .max(15, "Name must have 15 characters or less"),
+      .max(25, "Name must have 25 characters or less"),
     email: Zod.string({
       invalid_type_error: "Email must be string",
     }).email("You provided an invalid email, Please enter a valid email"),
     role: Zod.string({
-      invalid_type_error: "Email must be string",
+      invalid_type_error: "Role must be string",
     }).optional(),
   }).strict(),
 });
