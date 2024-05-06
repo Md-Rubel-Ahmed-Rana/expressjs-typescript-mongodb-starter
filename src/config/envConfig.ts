@@ -16,8 +16,8 @@ const defaultConfig = {
       process.env.JWT_ACCESS_TOKEN_SECRET || "defaultAccessTokenSecret",
     refreshTokenSecret:
       process.env.JWT_REFRESH_TOKEN_SECRET || "defaultRefreshTokenSecret",
-    accessTokenExpire: process.env.JWT_ACCESS_TOKEN_EXPIRE || "15m",
-    refreshTokenExpire: process.env.JWT_REFRESH_TOKEN_EXPIRE || "7d",
+    accessTokenExpire: process.env.JWT_ACCESS_TOKEN_EXPIRE || "3d",
+    refreshTokenExpire: process.env.JWT_REFRESH_TOKEN_EXPIRE || "30d",
   },
 };
 

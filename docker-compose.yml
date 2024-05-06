@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: express-typescript-mongodb-starter-app
+    build:
+      dockerfile: Dockerfile
+      context: ./
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "5005:5005"
+    restart: always
+    depends_on:
+      - mongodb
+    environment:
+      MONGO_URI: ${DB_URI}
+    env_file:
+      - .env
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

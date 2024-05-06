@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node ./dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "npx tsc",
+    "docker:build": "docker-compose build",
+    "docker:start": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
     "seed:db": "ts-node ./src/scripts/seedDatabase.ts",
     "reset:db": "ts-node ./src/scripts/resetDatabase.ts"
   },

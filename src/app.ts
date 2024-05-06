@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -14,14 +14,14 @@ import handleZodValidationError from "./errors/validationError";
 
 dotenv.config();
 
-const app = express();
+const app: Application = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(helmet());
 app.use(morgan("combined"));
-// app.use(apiRateLimiter.limitAPIRequest());
+app.use(apiRateLimiter.limitAPIRequest());
 
 // application routes
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
