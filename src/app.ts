@@ -1,26 +1,19 @@
-import cors from "cors";
-import dotenv from "dotenv";
-import express, { NextFunction, Request, Response } from "express";
+import express, { Application } from "express";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
-import morgan from "morgan";
 import "./events/index";
-import helmet from "helmet";
-import cookieParser from "cookie-parser";
-import { corsOptions } from "./config/corsOptions";
 import { AppRoutes } from "./routes";
+import {
+  expressMiddlewares,
+  notFoundRoutes,
+} from "./middlewares/expressMiddlewares";
 
+import dotenv from "dotenv";
 dotenv.config();
 
-const app = express();
+const app: Application = express();
 
 // middlewares
-app.use(cors(corsOptions));
-app.use(cookieParser());
-app.use(helmet());
-// Allow 100MB to be uploaded
-app.use(express.json({ limit: "100mb" }));
-app.use(express.urlencoded({ extended: true, limit: "100mb" }));
-app.use(morgan("dev"));
+expressMiddlewares(app);
 
 // health check
 app.get("/", async (req, res) => {
@@ -40,19 +33,6 @@ app.use("/api/v1", AppRoutes);
 app.use(globalErrorHandler.globalErrorHandler);
 
 // app route not found
-app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log(`User hit: '${req.originalUrl}' is not exist`);
-  res.status(404).json({
-    success: false,
-    message: "Not Found",
-    errorMessages: [
-      {
-        path: req.originalUrl,
-        message: "API Not Found",
-      },
-    ],
-  });
-  next();
-});
+notFoundRoutes(app);
 
 export default app;
