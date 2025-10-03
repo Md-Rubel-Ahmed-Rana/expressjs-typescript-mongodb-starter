@@ -8,6 +8,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { corsOptions } from "./config/corsOptions";
 import { AppRoutes } from "./routes";
+import { UUIDService } from "./lib/uuid";
 
 dotenv.config();
 
@@ -35,6 +36,8 @@ app.get("/", async (req, res) => {
 
 // applications routes
 app.use("/api/v1", AppRoutes);
+
+console.log("Husky test", UUIDService.generateCustom(10));
 
 // global error handler
 app.use(globalErrorHandler.globalErrorHandler);
