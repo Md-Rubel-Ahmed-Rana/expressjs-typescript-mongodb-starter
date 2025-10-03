@@ -1,5 +1,5 @@
 services:
-  gadget-glitz-server:
+  express-mongodb-server:
     build:
       context: .
       dockerfile: Dockerfile
@@ -7,8 +7,3 @@ services:
       - "5000:5000"
     env_file:
       - .env
-    networks:
-      - gadget-glitz-server-network
-networks:
-  gadget-glitz-server-network:
-    driver: bridge

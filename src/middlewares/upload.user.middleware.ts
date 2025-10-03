@@ -72,7 +72,7 @@ class Middleware {
       );
     }
 
-    const isExist = await UserService.returnAUserByPhoneNumber(
+    const isExist = await UserService.getUserByPhoneNumber(
       req.body?.phone_number
     );
 
