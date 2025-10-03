@@ -58,8 +58,10 @@ export const envConfig = {
     sender_id: process.env.SMS_SENDER_ID as string,
     base_url: process.env.SMS_BASE_URL as string,
   },
-  courier: {
-    api_key: process.env.COURIER_API_KEY as string,
-    secret_key: process.env.COURIER_SECRET_KEY as string,
+  email: {
+    host: process.env.MAIL_HOST as string,
+    port: Number(process.env.MAIL_PORT) as number,
+    user: process.env.MAIL_USER as string,
+    pass: process.env.MAIL_PASS as string,
   },
 };
