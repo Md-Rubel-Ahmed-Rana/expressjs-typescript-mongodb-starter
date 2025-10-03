@@ -1,70 +1,58 @@
-import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
-import helmet from "helmet";
-import morgan from "morgan";
 import dotenv from "dotenv";
-import { RootRoutes } from "./routes/root.routes";
-import apiRateLimiter from "./config/apiRateLimiter";
-import { logger } from "./config/logger";
-import swaggerUi from "swagger-ui-express";
-import fs from "fs";
-import path from "path";
-import { swaggerSpec } from "./config/apiDoc.swagger";
-import handleZodValidationError from "./errors/validationError";
+import express, { NextFunction, Request, Response } from "express";
+import globalErrorHandler from "./middlewares/globalErrorHandler";
+import morgan from "morgan";
+import "./events/index";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import { corsOptions } from "./config/corsOptions";
+import { AppRoutes } from "./routes";
 
 dotenv.config();
 
-const app: Application = express();
+const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+// middlewares
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(helmet());
-app.use(morgan("combined"));
-app.use(apiRateLimiter.limitAPIRequest());
+// Allow 100MB to be uploaded
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ extended: true, limit: "100mb" }));
+app.use(morgan("dev"));
 
-// application routes
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use("/api/v1", RootRoutes);
-
-app.get("/", (req, res) => {
-  const filePath = path.join(__dirname, "../public", "index.html");
-
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) {
-      logger.error(`Error reading HTML file: ${err.message}`);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
-
-    res.send(data);
+// health check
+app.get("/", async (req, res) => {
+  res.status(200).json({
+    statusCode: 200,
+    success: true,
+    message:
+      "Modular Express.js + MongoDB Server Boilerplate application is up and running",
+    data: null,
   });
 });
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const error = new Error(`Not Found - ${req.originalUrl}`);
-  res.status(404);
-  next(error);
-});
+// applications routes
+app.use("/api/v1", AppRoutes);
 
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  if (err.name === "ZodError") {
-    const errors = handleZodValidationError(err);
-    res.status(err.status || 500).json({
-      message: "Validation error. Invalid data provided",
-      errors,
-    });
-  } else {
-    logger.error(
-      `${err.status || 500} - ${err.message} - ${req.originalUrl} - ${
-        req.method
-      } - ${req.ip}`
-    );
-    res.status(err.status || 500).json({
-      error: {
-        message: err.message,
+// global error handler
+app.use(globalErrorHandler.globalErrorHandler);
+
+// app route not found
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`User hit: '${req.originalUrl}' is not exist`);
+  res.status(404).json({
+    success: false,
+    message: "Not Found",
+    errorMessages: [
+      {
+        path: req.originalUrl,
+        message: "API Not Found",
       },
-    });
-  }
+    ],
+  });
+  next();
 });
 
 export default app;

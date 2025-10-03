@@ -1,0 +1,14 @@
+services:
+  gadget-glitz-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    networks:
+      - gadget-glitz-server-network
+networks:
+  gadget-glitz-server-network:
+    driver: bridge
