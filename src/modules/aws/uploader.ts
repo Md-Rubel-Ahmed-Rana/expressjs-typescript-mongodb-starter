@@ -14,7 +14,7 @@ class Service {
   private readonly accessKeyId = envConfig.aws.access_key_id;
   private readonly secretAccessKey = envConfig.aws.secret_access_key;
   private readonly uploadBaseUrl = envConfig.aws.file_load_base_url;
-  private readonly rootFolder = "gadget-glitz";
+  private readonly rootFolder = "express-server";
 
   private s3Client = new S3Client({
     region: this.region,
