@@ -7,6 +7,7 @@ export const envConfig = {
   app: {
     port: process.env.PORT ? Number(process.env.PORT) : 5005,
     env: process.env.NODE_ENV as "development" | "production",
+    name: process.env.APP_NAME || "Express Modular App",
   },
   clients: {
     admin_dev: process.env.ADMIN_CLIENT_URL_DEV as string,
