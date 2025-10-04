@@ -3,6 +3,7 @@ import { envConfig } from "@/config/index";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import { JwtInstance } from "@/lib/jwt";
 import ApiError from "@/middlewares/error";
+import { UserService } from "@/modules/users/users.service";
 import { verificationEmailTemplate } from "@/templates/email/verification-template";
 import { Types } from "mongoose";
 
@@ -44,14 +45,40 @@ class Service {
 
   async verifyTokenFromLink(token: string) {
     if (!token) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "Token was not found");
-    }
-    const result = await JwtInstance.verifyEmailVerificationToken(token);
-    if (!result?.email) {
       throw new ApiError(
         HttpStatusCode.BAD_REQUEST,
-        "Invalid payload to verify email"
+        "Verification token is required"
       );
+    }
+
+    // Step 1: Verify and decode token
+    const result = await JwtInstance.verifyEmailVerificationToken(token);
+
+    if (!result?.email) {
+      throw new ApiError(
+        HttpStatusCode.UNAUTHORIZED,
+        "Invalid or malformed verification token"
+      );
+    }
+
+    // Step 2: Find the user by email
+    const user = await UserService.getUserByDynamicKeyValue(
+      "email",
+      result.email
+    );
+
+    if (!user) {
+      throw new ApiError(
+        HttpStatusCode.NOT_FOUND,
+        "No account found for this email. Please request a new verification link."
+      );
+    }
+
+    // Step 3 (Optional): Mark as verified if not already
+    if (!user.is_verified) {
+      await UserService.updateUserById(user._id as unknown as Types.ObjectId, {
+        is_verified: true,
+      });
     }
   }
 }
