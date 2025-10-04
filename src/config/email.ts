@@ -40,6 +40,7 @@ class Mail {
     try {
       const info = await transporter.sendMail(mailOptions);
       console.log(`[EmailService] ✅ Email sent: ${info.messageId}`);
+      return info;
     } catch (error: any) {
       console.error(`[EmailService] ❌ Failed: ${error.message}`);
       throw new ApiError(

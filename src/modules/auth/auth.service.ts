@@ -9,10 +9,10 @@ import {
 import { USER_STATUS } from "../users/users.enum";
 import { OTPService } from "../otp/otp.service";
 import ApiError from "@/middlewares/error";
-import { HttpStatusCode } from "@/lib/httpStatus";
 import { Types } from "mongoose";
 import { IOtpVerify } from "../otp/otp.interface";
 import { JwtInstance } from "@/lib/jwt";
+import { HttpStatusCode } from "@/lib/httpStatus";
 
 class Service {
   async register(data: IUser) {

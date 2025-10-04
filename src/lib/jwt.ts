@@ -6,10 +6,11 @@ import ApiError from "@/middlewares/error";
 import { HttpStatusCode } from "./httpStatus";
 import { cookieManager } from "@/shared/cookie";
 import { IRoles } from "@/constants/roles";
+import { IUser } from "@/modules/users/users.interface";
 
 class JWT {
   private signToken = async (
-    payload: IJWtPayload,
+    payload: Partial<IUser>,
     secret: string,
     expiresIn: string
   ): Promise<string> => {
@@ -17,7 +18,7 @@ class JWT {
   };
 
   private generateAccessToken = async (
-    payload: IJWtPayload
+    payload: Partial<IUser>
   ): Promise<string> => {
     return this.signToken(
       payload,
@@ -27,7 +28,7 @@ class JWT {
   };
 
   private generateRefreshToken = async (
-    payload: IJWtPayload
+    payload: Partial<IUser>
   ): Promise<string> => {
     return this.signToken(
       payload,
@@ -37,14 +38,18 @@ class JWT {
   };
 
   async generateTokens(
-    payload: IJWtPayload
+    payload: Partial<IUser>
   ): Promise<{ access_token: string; refresh_token: string }> {
     const access_token = await this.generateAccessToken(payload);
     const refresh_token = await this.generateRefreshToken(payload);
     return { access_token, refresh_token };
   }
 
-  public authenticate(allowedRoles?: IRoles[]) {
+  async generateEmailVerificationToken(payload: Partial<IUser>) {
+    return await this.signToken(payload, envConfig.jwt.secret, "10m");
+  }
+
+  authenticate(allowedRoles?: IRoles[]) {
     return async (req: Request, res: Response, next: NextFunction) => {
       const { access_token, refresh_token } = this.extractTokens(req, "header");
 
