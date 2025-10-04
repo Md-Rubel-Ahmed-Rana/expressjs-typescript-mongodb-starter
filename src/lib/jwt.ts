@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import jwt, { TokenExpiredError } from "jsonwebtoken";
+import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { envConfig } from "../config";
 import { IJWtPayload } from "@/interfaces/common.interface";
 import ApiError from "@/middlewares/error";
@@ -118,6 +118,42 @@ class JWT {
         );
       }
     };
+  }
+
+  async verifyEmailVerificationToken(token: string) {
+    if (!token) {
+      throw new ApiError(
+        HttpStatusCode.BAD_REQUEST,
+        "Verification token is required"
+      );
+    }
+
+    try {
+      // Decode and verify token using the app's JWT secret
+      const decoded = jwt.verify(token, envConfig.jwt.secret);
+
+      // Return decoded data for further use (e.g., user ID, email, etc.)
+      return decoded;
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        throw new ApiError(
+          HttpStatusCode.UNAUTHORIZED,
+          "Your verification link has expired. Please request a new one."
+        );
+      }
+
+      if (error instanceof JsonWebTokenError) {
+        throw new ApiError(
+          HttpStatusCode.UNAUTHORIZED,
+          "Invalid or malformed verification token"
+        );
+      }
+
+      throw new ApiError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        "Failed to verify email token"
+      );
+    }
   }
 
   private extractTokens(
