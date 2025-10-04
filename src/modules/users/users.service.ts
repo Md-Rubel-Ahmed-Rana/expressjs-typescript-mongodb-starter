@@ -73,7 +73,7 @@ class Service {
     refresh_token: string;
     user: IUser;
   }> {
-    const user = await UserModel.findOne({ phone_number: data.phone_number });
+    const user = await UserModel.findOne({ phone_number: data.credential });
 
     if (!user) {
       throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found!");

@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 import { IOTP } from "./otp.interface";
 
 const OtpSchema = new Schema<IOTP>({
-  phone_number: {
+  credential: {
     type: String,
     required: true,
   },

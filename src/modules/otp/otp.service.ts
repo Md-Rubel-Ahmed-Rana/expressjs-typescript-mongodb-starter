@@ -5,8 +5,8 @@ import { OTPModel } from "./otp.model";
 import { IOtpVerify } from "./otp.interface";
 
 class Service {
-  async sendVerificationOtp(phone_number: string) {
-    const isExist = await OTPModel.findOne({ phone_number });
+  async sendVerificationOtp(credential: string) {
+    const isExist = await OTPModel.findOne({ credential });
     if (isExist) {
       throw new ApiError(
         HttpStatusCode.BAD_REQUEST,
@@ -15,15 +15,15 @@ class Service {
     }
 
     const otp = await this.generateOtp();
-    await OTPModel.create({ phone_number, otp });
+    await OTPModel.create({ credential, otp });
 
     // send sms to verify account
-    await SMSService.sendOtp(phone_number, otp);
+    await SMSService.sendOtp(credential, otp);
   }
 
   async verifyOTP(data: IOtpVerify) {
     const otpRecord = await OTPModel.findOne({
-      phone_number: data.phone_number,
+      credential: data.credential,
     });
 
     if (!otpRecord) {
@@ -41,8 +41,8 @@ class Service {
     }
   }
 
-  async sendForgetPasswordOtp(phone_number: string) {
-    const isExist = await OTPModel.findOne({ phone_number });
+  async sendForgetPasswordOtp(credential: string) {
+    const isExist = await OTPModel.findOne({ credential });
     if (isExist) {
       throw new ApiError(
         HttpStatusCode.BAD_REQUEST,
@@ -52,10 +52,10 @@ class Service {
 
     // generate otp
     const otp = await this.generateOtp();
-    await OTPModel.create({ phone_number, otp });
+    await OTPModel.create({ credential, otp });
 
     // send sms
-    await SMSService.sendOtp(phone_number, otp);
+    await SMSService.sendOtp(credential, otp);
   }
 
   private async generateOtp(): Promise<number> {
