@@ -1,20 +1,26 @@
 import { Schema, model } from "mongoose";
 import { IOTP } from "./otp.interface";
+import { schemaOptions } from "@/utils/schemaOptions";
 
-const OtpSchema = new Schema<IOTP>({
-  credential: {
-    type: String,
-    required: true,
+const OtpSchema = new Schema<IOTP>(
+  {
+    credential: {
+      type: String,
+      required: true,
+    },
+    otp: {
+      type: Number,
+      required: true,
+    },
+    expireAt: {
+      type: Date,
+      required: true,
+    },
   },
-  otp: {
-    type: Number,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    expires: 120, // Document will be auto-deleted after 120 seconds (2 minutes)
-  },
-});
+  schemaOptions
+);
+
+// TTL index (auto-delete when expireAt <= now)
+OtpSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 
 export const OTPModel = model<IOTP>("Otp", OtpSchema);
