@@ -1,4 +1,5 @@
 import { MailService } from "@/config/email";
+import { IOtpVerify } from "@/modules/otp/otp.interface";
 import { OTPService } from "@/modules/otp/otp.service";
 import { verificationEmailOtpTemplate } from "@/templates/email/verification-template";
 
@@ -25,6 +26,9 @@ class Service {
       message: "Email verification otp has been sent successfully",
       result,
     });
+  }
+  async verifyOtp(data: IOtpVerify) {
+    await OTPService.verifyOTP(data);
   }
 }
 
