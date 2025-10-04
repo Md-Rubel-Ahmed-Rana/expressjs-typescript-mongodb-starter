@@ -103,3 +103,92 @@ export const verificationEmailTemplate = (payload: {
 </html>
 `;
 };
+
+export const verificationEmailOtpTemplate = (payload: {
+  name: string;
+  otp: number;
+}) => {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Your Account</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .header {
+      background-color: #4f46e5; /* Indigo-600 */
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .body {
+      padding: 30px 20px;
+      color: #333333;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .otp {
+      display: inline-block;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #4f46e5;
+      padding: 10px 20px;
+      margin: 20px 0;
+      border: 2px dashed #4f46e5;
+      border-radius: 8px;
+      letter-spacing: 4px;
+    }
+    .footer {
+      padding: 20px;
+      font-size: 0.85rem;
+      color: #777777;
+      text-align: center;
+      border-top: 1px solid #e0e0e0;
+    }
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px;
+      }
+      .otp {
+        font-size: 1.5rem;
+        padding: 8px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      Verify Your Account
+    </div>
+    <div class="body">
+      <p>Hi ${payload.name},</p>
+      <p>Use the following OTP to verify your account. This code will expire in 5 minutes.</p>
+      <div class="otp">${payload.otp}</div>
+      <p>If you did not request this, please ignore this email.</p>
+    </div>
+    <div class="footer">
+      &copy; ${new Date().getFullYear()} YourCompany. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
+`;
+};
