@@ -5,7 +5,7 @@ import { OTPModel } from "./otp.model";
 import { IOtpVerify } from "./otp.interface";
 
 class Service {
-  async createOtp(credential: string, durationMs: number) {
+  async createOtp(credential: string, durationMs: number): Promise<number> {
     const isExist = await OTPModel.findOne({ credential });
     if (isExist) {
       throw new ApiError(
@@ -17,11 +17,13 @@ class Service {
 
     const expireAt = new Date(Date.now() + durationMs);
 
-    return await OTPModel.create({
+    await OTPModel.create({
       credential,
       otp,
       expireAt,
     });
+
+    return otp;
   }
 
   async sendVerificationOtp(credential: string) {
