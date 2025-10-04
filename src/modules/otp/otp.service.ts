@@ -5,6 +5,18 @@ import { OTPModel } from "./otp.model";
 import { IOtpVerify } from "./otp.interface";
 
 class Service {
+  async createOtp(credential: string, durationMs: number) {
+    const otp = await this.generateOtp();
+
+    const expireAt = new Date(Date.now() + durationMs);
+
+    return await OTPModel.create({
+      credential,
+      otp,
+      expireAt,
+    });
+  }
+
   async sendVerificationOtp(credential: string) {
     const isExist = await OTPModel.findOne({ credential });
     if (isExist) {

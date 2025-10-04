@@ -1,7 +1,7 @@
 export type IOTP = {
   credential: string;
   otp: number;
-  createdAt: Date;
+  expireAt: Date;
 };
 
 export type IOtpVerify = {
