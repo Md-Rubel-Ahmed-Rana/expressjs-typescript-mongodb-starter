@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import jwt, {
+  JsonWebTokenError,
+  JwtPayload,
+  TokenExpiredError,
+} from "jsonwebtoken";
 import { envConfig } from "../config";
 import { IJWtPayload } from "@/interfaces/common.interface";
 import ApiError from "@/middlewares/error";
@@ -130,7 +134,7 @@ class JWT {
 
     try {
       // Decode and verify token using the app's JWT secret
-      const decoded = jwt.verify(token, envConfig.jwt.secret);
+      const decoded = jwt.verify(token, envConfig.jwt.secret) as JwtPayload;
 
       // Return decoded data for further use (e.g., user ID, email, etc.)
       return decoded;

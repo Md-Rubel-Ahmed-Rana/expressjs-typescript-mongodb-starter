@@ -375,6 +375,13 @@ class Service {
     return user;
   }
 
+  async getUserByDynamicKeyValue(
+    key: keyof IUser,
+    value: string | number
+  ): Promise<IUser | null> {
+    return await UserModel.findOne({ [key]: value });
+  }
+
   async updateUserById(id: string | Types.ObjectId, data: Partial<IUser>) {
     return await UserModel.findByIdAndUpdate(id, data, { new: true }).select({
       password: 0,
