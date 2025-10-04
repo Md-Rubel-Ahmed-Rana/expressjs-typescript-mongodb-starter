@@ -1,6 +1,8 @@
 import { MailService } from "@/config/email";
 import { envConfig } from "@/config/index";
+import { HttpStatusCode } from "@/lib/httpStatus";
 import { JwtInstance } from "@/lib/jwt";
+import ApiError from "@/middlewares/error";
 import { verificationEmailTemplate } from "@/templates/email/verification-template";
 import { Types } from "mongoose";
 
@@ -38,6 +40,19 @@ class Service {
       message: `Email verification email has been sent to ${payload.email}`,
       result,
     });
+  }
+
+  async verifyTokenFromLink(token: string) {
+    if (!token) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "Token was not found");
+    }
+    const result = await JwtInstance.verifyEmailVerificationToken(token);
+    if (!result?.email) {
+      throw new ApiError(
+        HttpStatusCode.BAD_REQUEST,
+        "Invalid payload to verify email"
+      );
+    }
   }
 }
 
