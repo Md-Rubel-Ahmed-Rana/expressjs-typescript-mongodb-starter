@@ -3,8 +3,8 @@ import z from "zod";
 export const resendOtp = z.object({
   body: z
     .object({
-      phone_number: z.string({
-        required_error: "Phone number is required",
+      credential: z.string({
+        required_error: "Credential is required",
       }),
     })
     .strict(),
@@ -13,8 +13,8 @@ export const resendOtp = z.object({
 const verifyOtp = z.object({
   body: z
     .object({
-      phone_number: z.string({
-        required_error: "Phone number is required",
+      credential: z.string({
+        required_error: "Credential is required",
       }),
       otp: z.number({
         required_error: "Otp must be provided",

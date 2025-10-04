@@ -67,7 +67,7 @@ class Service {
     refresh_token: string;
     user: IUser;
   }> {
-    const user = await UserService.getUserByPhoneNumber(data.phone_number);
+    const user = await UserService.getUserByPhoneNumber(data.credential);
 
     // prevent already verified account
     if (user?.status === USER_STATUS.ACTIVE) {

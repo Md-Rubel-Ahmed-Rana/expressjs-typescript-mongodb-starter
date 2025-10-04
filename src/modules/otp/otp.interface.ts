@@ -1,10 +1,10 @@
 export type IOTP = {
-  phone_number: string;
+  credential: string;
   otp: number;
   createdAt: Date;
 };
 
 export type IOtpVerify = {
-  phone_number: string;
+  credential: string;
   otp: number;
 };
