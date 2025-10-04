@@ -6,6 +6,13 @@ import { IOtpVerify } from "./otp.interface";
 
 class Service {
   async createOtp(credential: string, durationMs: number) {
+    const isExist = await OTPModel.findOne({ credential });
+    if (isExist) {
+      throw new ApiError(
+        HttpStatusCode.CONFLICT,
+        "An OTP has already been sent. Please check your messages and verify."
+      );
+    }
     const otp = await this.generateOtp();
 
     const expireAt = new Date(Date.now() + durationMs);
