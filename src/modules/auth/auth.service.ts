@@ -4,6 +4,7 @@ import { UserService } from "../users/users.service";
 import {
   IChangePassword,
   ILoginCredentials,
+  ILoginResponse,
   IResetPassword,
 } from "@/interfaces/common.interface";
 import { USER_STATUS } from "../users/users.enum";
@@ -156,11 +157,9 @@ class Service {
     await OTPService.sendForgetPasswordOtp(phone_number);
   }
 
-  private async generateLoginCredentials(id: Types.ObjectId | string): Promise<{
-    access_token: string;
-    refresh_token: string;
-    user: IUser;
-  }> {
+  private async generateLoginCredentials(
+    id: Types.ObjectId | string
+  ): Promise<ILoginResponse> {
     const user: any = await UserService.getUserByIdWithoutPassword(id);
 
     const payload: any = {
@@ -176,6 +175,20 @@ class Service {
       access_token,
       refresh_token,
     };
+  }
+
+  async googleLogin(data: IUser): Promise<ILoginResponse> {
+    const isExist: any = await UserService.getUserByDynamicKeyValue(
+      "email",
+      data?.email
+    );
+
+    if (isExist) {
+      return await this.generateLoginCredentials(isExist?._id);
+    } else {
+      const result: any = await UserService.create(data);
+      return await this.generateLoginCredentials(result?._id);
+    }
   }
 }
 
