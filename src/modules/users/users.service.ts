@@ -45,6 +45,8 @@ class Service {
 
     // fire event for a new user
     emitter.emit("user.registered", result._id);
+
+    return result;
   }
 
   async createUserByAdmin(data: IUser) {

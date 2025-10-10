@@ -2,6 +2,8 @@ import BaseController from "@/shared/baseController";
 import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
 import { HttpStatusCode } from "@/lib/httpStatus";
+import { cookieManager } from "@/shared/cookie";
+import { envConfig } from "@/config/index";
 
 class Controller extends BaseController {
   register = this.catchAsync(async (req: Request, res: Response) => {
@@ -84,6 +86,16 @@ class Controller extends BaseController {
       message: "Your password has been changed successfully",
       data: null,
     });
+  });
+
+  googleLogin = this.catchAsync(async (req: Request, res: Response) => {
+    if (req?.user) {
+      const { access_token, refresh_token } = await AuthService.googleLogin(
+        req.user
+      );
+      cookieManager.setTokens(res, access_token, refresh_token);
+      res.redirect(envConfig.google_auth.redirect_url);
+    }
   });
 }
 

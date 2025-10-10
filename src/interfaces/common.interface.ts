@@ -1,4 +1,5 @@
 import { IRoles } from "@/constants/roles";
+import { IUser } from "@/modules/users/users.interface";
 import { Types } from "mongoose";
 
 export type IJWtPayload = {
@@ -20,4 +21,10 @@ export type ILoginCredentials = {
 export type IResetPassword = {
   phone_number: string;
   password: string;
+};
+
+export type ILoginResponse = {
+  access_token: string;
+  refresh_token: string;
+  user: IUser;
 };
