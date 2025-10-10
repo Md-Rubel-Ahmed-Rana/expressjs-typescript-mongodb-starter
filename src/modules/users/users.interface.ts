@@ -13,7 +13,6 @@ export type IUser = {
   status: IUserStatus;
   date_of_birth?: Date;
   gender?: "male" | "female";
-  otp_channel: "email" | "sms";
   last_login_at?: Date;
 } & Document;
 
