@@ -1,5 +1,6 @@
 import { AuthRoutes } from "@/modules/auth/auth.routes";
 import { OTPRoutes } from "@/modules/otp/otp.route";
+import { UserSettingPublicRoutes } from "@/modules/user-settings/routes/public.routes";
 import { UserPublicRoutes } from "@/modules/users/routes/public.routes";
 import { Router } from "express";
 
@@ -17,6 +18,10 @@ const routes = [
   {
     path: "/users",
     route: UserPublicRoutes,
+  },
+  {
+    path: "/user-settings",
+    route: UserSettingPublicRoutes,
   },
 ];
 
