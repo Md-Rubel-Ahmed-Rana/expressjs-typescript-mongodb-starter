@@ -28,6 +28,11 @@ export const envConfig = {
     access_cookie_name: "myapp_auth_access_token",
     refresh_cookie_name: "myapp_auth_refresh_token",
   },
+  redis: {
+    password: process.env.REDIS_PASSWORD as string,
+    host: process.env.REDIS_HOST as string,
+    port: process.env.REDIS_PORT as string,
+  },
   aws: {
     access_key_id: process.env.AWS_ACCESS_KEY_ID as string,
     secret_access_key: process.env.AWS_SECRET_ACCESS_KEY as string,
