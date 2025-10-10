@@ -39,6 +39,12 @@ export const envConfig = {
     app_user: process.env.APP_USER as string,
     app_pass: process.env.APP_PASSWORD as string,
   },
+  google_auth: {
+    client_id: process.env.GOOGLE_CLIENT_ID as string,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET as string,
+    callback_url: process.env.GOOGLE_CALLBACK_URL as string,
+    redirect_url: process.env.GOOGLE_REDIRECT_URL as string,
+  },
   bkash: {
     urls: {
       grant_token_url: process.env.BKASH_GRANT_TOKEN_URL as string,
