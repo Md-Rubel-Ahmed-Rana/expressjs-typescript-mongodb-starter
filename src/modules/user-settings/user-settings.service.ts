@@ -12,6 +12,11 @@ class Service {
       console.log("Failed to initiate user setting from event fire", error);
     }
   }
+
+  // get setting by user id for a user
+  async getMySettings(user_id: Types.ObjectId | string) {
+    return await UserSettingModel.findById(user_id);
+  }
 }
 
 export const UserSettingService = new Service();
