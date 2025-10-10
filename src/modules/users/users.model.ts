@@ -17,7 +17,7 @@ const userSchema = new Schema<IUser>(
     status: {
       type: String,
       enum: Object.values(USER_STATUS),
-      default: "inactive",
+      default: USER_STATUS.INACTIVE,
     },
     date_of_birth: { type: Date, default: null },
     gender: {

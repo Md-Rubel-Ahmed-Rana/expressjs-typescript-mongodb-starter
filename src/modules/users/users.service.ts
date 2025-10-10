@@ -18,6 +18,7 @@ import { paginationHelpers } from "@/helpers/paginationHelpers";
 import { userSearchableFields } from "./users.constants";
 import { USER_STATUS } from "./users.enum";
 import { JwtInstance } from "@/lib/jwt";
+import { UUIDService } from "@/lib/uuid";
 
 class Service {
   async create(data: IUser) {
@@ -30,6 +31,11 @@ class Service {
         HttpStatusCode.CONFLICT,
         `You already have an account with this phone number. Please use a different phone number to create account or login`
       );
+    }
+
+    // generate username
+    if (data?.email) {
+      data.username = this.generateUserName(data.email) ?? "";
     }
 
     const result = await UserModel.create(data);
@@ -394,6 +400,16 @@ class Service {
       throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
     }
     return { id };
+  }
+
+  private generateUserName(email: string) {
+    if (!email) {
+      return;
+    }
+    const uuidPart = UUIDService.generateFirstPart();
+    const emailPrefix = email.split("@")[0].replace(/\./g, "").toLowerCase();
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    return `${emailPrefix}${randomNum}${uuidPart}`;
   }
 }
 
