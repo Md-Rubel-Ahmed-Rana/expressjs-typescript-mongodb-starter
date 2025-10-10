@@ -7,6 +7,7 @@ import { USER_STATUS } from "./users.enum";
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
+    username: { type: String, required: true, unique: true, index: true },
     phone_number: { type: String, required: true },
     profile_picture: { type: String, default: "" },
     email: { type: String, default: "" },
@@ -24,6 +25,7 @@ const userSchema = new Schema<IUser>(
       enum: ["male", "female"],
       default: null,
     },
+    otp_channel: { type: String, enum: ["email", "sms"], default: "email" },
     last_login_at: { type: Date, default: null },
   },
   schemaOptions
