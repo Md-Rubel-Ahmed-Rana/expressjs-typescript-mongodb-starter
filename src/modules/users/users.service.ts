@@ -43,10 +43,8 @@ class Service {
     // send verification otp to SMS
     await OTPService.sendVerificationOtp(data.phone_number);
 
-    // fire event to create cart if role === "customer"
-    if (data.role === ROLES.CUSTOMER) {
-      emitter.emit("user.registered", result._id);
-    }
+    // fire event for a new user
+    emitter.emit("user.registered", result._id);
   }
 
   async createUserByAdmin(data: IUser) {
