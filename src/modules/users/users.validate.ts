@@ -14,9 +14,8 @@ const create = z.object({
         required_error: "Phone number is required",
       }),
       email: z
-        .string()
-        .email({ message: "Please provide a valid email" })
-        .optional(),
+        .string({ required_error: "Email is required" })
+        .email({ message: "Please provide a valid email" }),
       password: z
         .string({ required_error: "Password is required" })
         .min(6, "Password must be at least 6 characters")

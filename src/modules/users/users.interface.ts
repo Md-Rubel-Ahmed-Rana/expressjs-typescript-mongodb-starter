@@ -6,7 +6,7 @@ export type IUser = {
   username: string; // auto generated from name
   phone_number: string;
   profile_picture?: string;
-  email?: string;
+  email: string;
   role: string;
   is_verified?: boolean;
   password: string;
