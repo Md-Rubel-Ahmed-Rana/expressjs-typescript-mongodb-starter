@@ -69,17 +69,21 @@ class Controller extends BaseController {
   });
 
   login = this.catchAsync(async (req: Request, res: Response) => {
-    const result = await AuthService.login(req.body);
+    const { access_token, refresh_token, user } = await AuthService.login(
+      req.body
+    );
+    cookieManager.setTokens(res, access_token, refresh_token);
     this.sendResponse(res, {
       statusCode: HttpStatusCode.OK,
       success: true,
       message: "User has been logged in  successfully",
-      data: result,
+      data: user,
     });
   });
 
   changePassword = this.catchAsync(async (req: Request, res: Response) => {
     await AuthService.changePassword(req.user?.id, req.body);
+    cookieManager.clearTokens(res);
     this.sendResponse(res, {
       statusCode: HttpStatusCode.OK,
       success: true,
