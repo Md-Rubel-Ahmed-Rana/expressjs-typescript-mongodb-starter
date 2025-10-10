@@ -25,7 +25,6 @@ const userSchema = new Schema<IUser>(
       enum: ["male", "female"],
       default: null,
     },
-    otp_channel: { type: String, enum: ["email", "sms"], default: "email" },
     last_login_at: { type: Date, default: null },
   },
   schemaOptions

@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 export type IUserSetting = {
   user: Types.ObjectId;
 
-  otp_channel: "email" | "sms";
+  otp_channel: IOtpChannel;
 
   notification: {
     email_notifications: boolean;
@@ -14,11 +14,17 @@ export type IUserSetting = {
   preferences: {
     language: string;
     timezone: string;
-    theme: "light" | "dark" | "system";
+    theme: ITheme;
   };
 
   privacy: {
-    profile_visibility: "public" | "private" | "friends-only";
+    profile_visibility: IProfileVisibility;
     two_factor_auth_enabled: boolean;
   };
 };
+
+export type IOtpChannel = "email" | "sms";
+
+export type ITheme = "light" | "dark" | "system";
+
+export type IProfileVisibility = "public" | "private" | "friends-only";
