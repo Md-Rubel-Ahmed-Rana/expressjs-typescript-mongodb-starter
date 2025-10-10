@@ -8,12 +8,16 @@ import {
 } from "./middlewares/expressMiddlewares";
 
 import dotenv from "dotenv";
+import { initiatePassportSession } from "./config/passportSession";
 dotenv.config();
 
 const app: Application = express();
 
 // middlewares
 expressMiddlewares(app);
+
+// initialize passport session
+initiatePassportSession(app);
 
 // health check
 app.get("/", async (req, res) => {
