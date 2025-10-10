@@ -3,6 +3,7 @@ import { Document } from "mongoose";
 
 export type IUser = {
   name: string;
+  username: string; // auto generated from name
   phone_number: string;
   profile_picture?: string;
   email?: string;
@@ -12,6 +13,7 @@ export type IUser = {
   status: IUserStatus;
   date_of_birth?: Date;
   gender?: "male" | "female";
+  otp_channel: "email" | "sms";
   last_login_at?: Date;
 } & Document;
 
