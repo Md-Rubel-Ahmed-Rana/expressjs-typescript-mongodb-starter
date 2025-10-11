@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 
 export type IJWtPayload = {
   id: string | Types.ObjectId;
-  phone_number: string;
+  email: string;
   role: IRoles;
 };
 
@@ -14,12 +14,12 @@ export type IChangePassword = {
 };
 
 export type ILoginCredentials = {
-  phone_number: string;
+  email: string;
   password: string;
 };
 
 export type IResetPassword = {
-  phone_number: string;
+  email: string;
   password: string;
 };
 

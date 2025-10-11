@@ -14,3 +14,8 @@ export enum PROFILE_VISIBILITY {
   PRIVATE = "private",
   FRIEND_ONLY = "friends-only",
 }
+
+export enum VERIFICATION_METHOD {
+  LINK = "link",
+  OTP = "otp",
+}

@@ -4,6 +4,7 @@ export type IUserSetting = {
   user: Types.ObjectId;
 
   otp_channel: IOtpChannel;
+  verification_method: IVerificationMethod;
 
   notification: {
     email_notifications: boolean;
@@ -24,6 +25,7 @@ export type IUserSetting = {
 };
 
 export type IOtpChannel = "email" | "sms";
+export type IVerificationMethod = "link" | "otp";
 
 export type ITheme = "light" | "dark" | "system";
 

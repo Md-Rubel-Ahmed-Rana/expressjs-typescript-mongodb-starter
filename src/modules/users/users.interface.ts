@@ -1,7 +1,9 @@
 import { IRoles } from "@/constants/roles";
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
 export type IUser = {
+  id: Types.ObjectId | string;
+  _id: Types.ObjectId | string;
   name: string;
   username: string; // auto generated from name
   phone_number: string;

@@ -26,22 +26,6 @@ class Service {
     return otp;
   }
 
-  async sendVerificationOtp(credential: string) {
-    const isExist = await OTPModel.findOne({ credential });
-    if (isExist) {
-      throw new ApiError(
-        HttpStatusCode.BAD_REQUEST,
-        "We've already sent an OTP to your inbox. Please check sms and verify your account"
-      );
-    }
-
-    const otp = await this.generateOtp();
-    await OTPModel.create({ credential, otp });
-
-    // send sms to verify account
-    await SMSService.sendOtp(credential, otp);
-  }
-
   async verifyOTP(data: IOtpVerify) {
     const otpRecord = await OTPModel.findOne({
       credential: data.credential,

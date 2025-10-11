@@ -56,19 +56,6 @@ class Controller extends BaseController {
     }
   );
 
-  login = this.catchAsync(async (req: Request, res: Response) => {
-    const result = await UserService.login(req.body);
-    // store tokens on cookie
-    // cookieManager.setTokens(res, access_token, refresh_token);
-
-    this.sendResponse(res, {
-      statusCode: HttpStatusCode.OK,
-      success: true,
-      message: "You've logged in successfully",
-      data: result,
-    });
-  });
-
   getLoggedInUser = this.catchAsync(async (req: Request, res: Response) => {
     const user = await UserService.getLoggedInUser(req?.user?.id);
     this.sendResponse(res, {
@@ -92,17 +79,6 @@ class Controller extends BaseController {
       success: true,
       message: "Users retrieved successfully",
       data: user,
-    });
-  });
-
-  resetPassword = this.catchAsync(async (req: Request, res: Response) => {
-    await UserService.resetPassword(req.body);
-    this.sendResponse(res, {
-      statusCode: HttpStatusCode.OK,
-      success: true,
-      message:
-        "Your password has been reset successfully. Please login to your account",
-      data: null,
     });
   });
 
@@ -150,16 +126,6 @@ class Controller extends BaseController {
       success: true,
       message: "User has been deleted successfully",
       data: result,
-    });
-  });
-
-  logout = this.catchAsync(async (req: Request, res: Response) => {
-    cookieManager.clearTokens(res);
-    this.sendResponse(res, {
-      statusCode: HttpStatusCode.OK,
-      success: true,
-      message: "Your have logged out",
-      data: null,
     });
   });
 }
