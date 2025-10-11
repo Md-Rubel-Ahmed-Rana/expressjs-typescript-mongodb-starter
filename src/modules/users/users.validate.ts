@@ -10,9 +10,7 @@ const create = z.object({
           invalid_type_error: "Name must be string/text",
         })
         .min(3, "Name must be at least 3 characters"),
-      phone_number: z.string({
-        required_error: "Phone number is required",
-      }),
+      phone_number: z.string(),
       email: z
         .string({ required_error: "Email is required" })
         .email({ message: "Please provide a valid email" }),
