@@ -76,6 +76,7 @@ class Service {
     if (!user.is_verified) {
       await UserService.updateUserById(user._id as unknown as Types.ObjectId, {
         is_verified: true,
+        last_login_at: new Date(),
       });
     }
 
