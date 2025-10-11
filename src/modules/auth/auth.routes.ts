@@ -13,10 +13,6 @@ router.post(
   AuthController.register
 );
 
-router.post("/verify-otp", AuthController.verifyAccount);
-
-router.post("/resend-otp", AuthController.resendVerificationOtp);
-
 router.get("/", JwtInstance.authenticate(), AuthController.getLoggedInUser);
 
 router.post("/forget-password", AuthController.forgetPassword);

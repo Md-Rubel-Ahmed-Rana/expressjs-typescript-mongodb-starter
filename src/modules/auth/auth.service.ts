@@ -177,7 +177,7 @@ class Service {
     await OTPService.sendForgetPasswordOtp(phone_number);
   }
 
-  private async generateLoginCredentials(
+  async generateLoginCredentials(
     id: Types.ObjectId | string
   ): Promise<ILoginResponse> {
     const user: any = await UserService.getUserByIdWithoutPassword(id);

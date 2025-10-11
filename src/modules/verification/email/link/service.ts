@@ -1,8 +1,10 @@
 import { MailService } from "@/config/email";
 import { envConfig } from "@/config/index";
+import { ILoginResponse } from "@/interfaces/common.interface";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import { JwtInstance } from "@/lib/jwt";
 import ApiError from "@/middlewares/error";
+import { AuthService } from "@/modules/auth/auth.service";
 import { UserService } from "@/modules/users/users.service";
 import { verificationEmailTemplate } from "@/templates/email/verification-template";
 import { Types } from "mongoose";
@@ -39,7 +41,7 @@ class Service {
     });
   }
 
-  async verifyTokenFromLink(token: string) {
+  async verifyTokenFromLink(token: string): Promise<ILoginResponse> {
     if (!token) {
       throw new ApiError(
         HttpStatusCode.BAD_REQUEST,
@@ -76,6 +78,8 @@ class Service {
         is_verified: true,
       });
     }
+
+    return await AuthService.generateLoginCredentials(user._id);
   }
 }
 

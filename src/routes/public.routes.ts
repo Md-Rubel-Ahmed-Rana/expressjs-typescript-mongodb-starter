@@ -2,6 +2,7 @@ import { AuthRoutes } from "@/modules/auth/auth.routes";
 import { OTPRoutes } from "@/modules/otp/otp.route";
 import { UserSettingPublicRoutes } from "@/modules/user-settings/routes/public.routes";
 import { UserPublicRoutes } from "@/modules/users/routes/public.routes";
+import { VerificationRoutes } from "@/modules/verification/routes";
 import { Router } from "express";
 
 const router = Router();
@@ -22,6 +23,10 @@ const routes = [
   {
     path: "/user-settings",
     route: UserSettingPublicRoutes,
+  },
+  {
+    path: "/verification",
+    route: VerificationRoutes,
   },
 ];
 
