@@ -14,17 +14,18 @@ import { userSearchableFields } from "./users.constants";
 import { USER_STATUS } from "./users.enum";
 import { JwtInstance } from "@/lib/jwt";
 import { UUIDService } from "@/lib/uuid";
+import { EmailVerifyLinkService } from "../verification/email/link";
 
 class Service {
   async create(data: IUser) {
     const isExist = await UserModel.findOne({
-      phone_number: data.phone_number,
+      email: data.email,
     });
 
     if (isExist) {
       throw new ApiError(
         HttpStatusCode.CONFLICT,
-        `You already have an account with this phone number. Please use a different phone number to create account or login`
+        `You already have an account. Please login to your account`
       );
     }
 
@@ -33,9 +34,13 @@ class Service {
       data.username = this.generateUserName(data.email) ?? "";
     }
 
-    const result = await UserModel.create(data);
-
     // send verification link or otp
+    await EmailVerifyLinkService.sendVerificationLink({
+      email: data.email,
+      name: data.name,
+    });
+
+    const result = await UserModel.create(data);
 
     // fire event for a new user
     emitter.emit("user.registered", result._id);

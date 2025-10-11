@@ -8,11 +8,7 @@ import { verificationEmailTemplate } from "@/templates/email/verification-templa
 import { Types } from "mongoose";
 
 class Service {
-  async sendVerificationLink(payload: {
-    id: Types.ObjectId | string;
-    name: string;
-    email: string;
-  }) {
+  async sendVerificationLink(payload: { name: string; email: string }) {
     console.log(payload);
     // steps analysis
     // 1. generate jwt token with user unique credentials
