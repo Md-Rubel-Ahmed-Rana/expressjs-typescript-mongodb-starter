@@ -1,6 +1,11 @@
 import { MailService } from "@/config/email";
+import { ILoginResponse } from "@/interfaces/common.interface";
+import { HttpStatusCode } from "@/lib/httpStatus";
+import ApiError from "@/middlewares/error";
+import { AuthService } from "@/modules/auth/auth.service";
 import { IOtpVerify } from "@/modules/otp/otp.interface";
 import { OTPService } from "@/modules/otp/otp.service";
+import { UserService } from "@/modules/users/users.service";
 import { verificationEmailOtpTemplate } from "@/templates/email/verification-template";
 
 class Service {
@@ -27,8 +32,19 @@ class Service {
       result,
     });
   }
-  async verifyOtp(data: IOtpVerify) {
+
+  async verifyOtp(data: IOtpVerify): Promise<ILoginResponse> {
+    const user = await UserService.getUserByDynamicKeyValue(
+      "email",
+      data.credential
+    );
+    if (!user) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "User not found");
+    }
+
     await OTPService.verifyOTP(data);
+
+    return await AuthService.generateLoginCredentials(user._id);
   }
 }
 

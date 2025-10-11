@@ -44,6 +44,9 @@ class Service {
         "Your provided otp was wrong. Please try with correct otp"
       );
     }
+
+    // delete the otp
+    await OTPModel.findByIdAndDelete(otpRecord._id);
   }
 
   async sendForgetPasswordOtp(credential: string) {
