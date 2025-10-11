@@ -15,6 +15,17 @@ class Controller extends BaseController {
       data: user,
     });
   });
+
+  resendEmailVerifyOtp = this.catchAsync(async (req, res) => {
+    await EmailVerifyOTPService.sendEmailVerifyOtp(req.body);
+    this.sendResponse(res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message:
+        "We've resent a verification code to your email. Please verify your account",
+      data: null,
+    });
+  });
 }
 
 export const EmailVerifyOtpController = new Controller();
