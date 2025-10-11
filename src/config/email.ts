@@ -23,7 +23,7 @@ class Mail {
     });
 
     const mailOptions: SMTPTransport.Options = {
-      from: `Munch Hub <${envConfig.email.user}>`,
+      from: `${envConfig.app.name} <${envConfig.email.user}>`,
       to: to,
       subject: subject,
       html: htmlContent,

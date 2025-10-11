@@ -12,7 +12,7 @@ class Controller extends BaseController {
       statusCode: HttpStatusCode.CREATED,
       success: true,
       message:
-        "Your account has been created successfully. We've sent a verification code to your phone number",
+        "Your account has been created successfully. We've sent a verification link to your email. Please verify your account",
     });
   });
 
