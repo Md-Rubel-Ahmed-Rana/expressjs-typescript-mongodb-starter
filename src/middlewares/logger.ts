@@ -1,5 +1,6 @@
 import { emitter } from "@/events/eventEmitter";
 import { Request, Response, NextFunction } from "express";
+import { envConfig } from "../config";
 
 export const loggerMiddleware = (
   req: Request,
@@ -24,8 +25,12 @@ export const loggerMiddleware = (
       fullUrl: `${req.protocol}://${req.get("host")}${req.originalUrl}`,
     };
 
+    console.log(logData);
+
     // fire event to store/rewrite log file
-    emitter.emitAsync("apiLog", logData);
+    if (envConfig.app.env === "development") {
+      emitter.emitAsync("apiLog", logData);
+    }
 
     return originalSend.call(this, body);
   };

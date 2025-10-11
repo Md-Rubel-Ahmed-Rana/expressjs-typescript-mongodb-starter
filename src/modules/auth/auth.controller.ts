@@ -101,6 +101,16 @@ class Controller extends BaseController {
       res.redirect(envConfig.google_auth.redirect_url);
     }
   });
+
+  logout = this.catchAsync(async (req: Request, res: Response) => {
+    cookieManager.clearTokens(res);
+    this.sendResponse(res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "User logged out successfully",
+      data: null,
+    });
+  });
 }
 
 export const AuthController = new Controller();

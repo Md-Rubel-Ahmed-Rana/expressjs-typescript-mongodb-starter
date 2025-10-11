@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
 import { corsOptions } from "@/config/corsOptions";
+import { loggerMiddleware } from "./logger";
 
 export const expressMiddlewares = (app: Application) => {
   app.use(cors(corsOptions));
@@ -13,6 +14,9 @@ export const expressMiddlewares = (app: Application) => {
   app.use(express.json({ limit: "100mb" }));
   app.use(express.urlencoded({ extended: true, limit: "100mb" }));
   app.use(morgan("dev"));
+
+  // logger
+  app.use(loggerMiddleware);
 };
 
 export const notFoundRoutes = (app: Application) => {

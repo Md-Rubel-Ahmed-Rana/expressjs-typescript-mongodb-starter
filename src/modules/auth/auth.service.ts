@@ -27,10 +27,16 @@ class Service {
     refresh_token: string;
     user: IUser;
   }> {
-    const user = await UserService.getUserByPhoneNumber(data.phone_number);
+    const user = await UserService.getUserByDynamicKeyValue(
+      "email",
+      data.email
+    );
+    if (!user) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
+    }
     if (user.status === USER_STATUS.INACTIVE) {
-      // send a verification otp
-      await OTPService.sendVerificationOtp(data.phone_number);
+      // send a verification link or otp
+
       throw new ApiError(
         HttpStatusCode.UNAUTHORIZED,
         "Your account is not activated yet. We've sent a verification otp. Please check SMS & verify to access your account"
@@ -68,7 +74,14 @@ class Service {
     refresh_token: string;
     user: IUser;
   }> {
-    const user = await UserService.getUserByPhoneNumber(data.credential);
+    const user = await UserService.getUserByDynamicKeyValue(
+      "email",
+      data.credential
+    );
+
+    if (!user) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
+    }
 
     // prevent already verified account
     if (user?.status === USER_STATUS.ACTIVE) {
@@ -103,14 +116,21 @@ class Service {
   }
 
   async resendVerificationOtp(phone_number: string) {
-    await UserService.getUserByPhoneNumber(phone_number);
-    // send verification sms with OTP
-    await OTPService.sendVerificationOtp(phone_number);
+    // await UserService.getUserByPhoneNumber(phone_number);
+    // send verification link or otp
+    console.log(phone_number);
   }
 
   async resetPassword(data: IResetPassword) {
     console.log(data);
-    const user: any = await UserService.getUserByPhoneNumber(data.phone_number);
+    const user = await UserService.getUserByDynamicKeyValue(
+      "email",
+      data.email
+    );
+
+    if (!user) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
+    }
 
     const newPassword = await BcryptInstance.hash(data.password);
 
@@ -152,7 +172,7 @@ class Service {
   }
 
   async forgetPassword(phone_number: string) {
-    await UserService.getUserByPhoneNumber(phone_number);
+    await UserService.getUserByDynamicKeyValue("phone_number", phone_number);
 
     await OTPService.sendForgetPasswordOtp(phone_number);
   }

@@ -21,6 +21,8 @@ const create = z.object({
       role: z.enum([...Object.values(ROLES)] as [string, ...string[]], {
         required_error: "User role is required",
       }),
+      gender: z.enum(["male", "female"] as [string, ...string[]]).optional(),
+      date_of_birth: z.string().optional(),
     })
     .strict(),
 });

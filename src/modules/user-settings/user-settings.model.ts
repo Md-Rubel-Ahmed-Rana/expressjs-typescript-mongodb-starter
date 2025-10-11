@@ -5,6 +5,7 @@ import {
   OTP_CHANNEL,
   PROFILE_VISIBILITY,
   THEME,
+  VERIFICATION_METHOD,
 } from "./user-settings.constants";
 
 const userSettingSchema = new Schema<IUserSetting>(
@@ -20,6 +21,11 @@ const userSettingSchema = new Schema<IUserSetting>(
       type: String,
       enum: Object.values(OTP_CHANNEL),
       default: OTP_CHANNEL.EMAIL,
+    },
+    verification_method: {
+      type: String,
+      enum: Object.values(VERIFICATION_METHOD),
+      default: VERIFICATION_METHOD.LINK,
     },
     notification: {
       email_notifications: { type: Boolean, default: true },

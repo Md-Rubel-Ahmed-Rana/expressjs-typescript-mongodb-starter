@@ -6,12 +6,7 @@ import { BcryptInstance } from "@/lib/bcrypt";
 import { OTPService } from "../otp/otp.service";
 import { IOtpVerify } from "../otp/otp.interface";
 import { Types } from "mongoose";
-import {
-  IChangePassword,
-  ILoginCredentials,
-  IResetPassword,
-} from "@/interfaces/common.interface";
-import { ROLES } from "@/constants/roles";
+import { IChangePassword } from "@/interfaces/common.interface";
 import { emitter } from "@/events/eventEmitter";
 import { IPaginationOptions } from "@/interfaces/pagination.interfaces";
 import { paginationHelpers } from "@/helpers/paginationHelpers";
@@ -40,8 +35,7 @@ class Service {
 
     const result = await UserModel.create(data);
 
-    // send verification otp to SMS
-    await OTPService.sendVerificationOtp(data.phone_number);
+    // send verification link or otp
 
     // fire event for a new user
     emitter.emit("user.registered", result._id);
@@ -66,10 +60,8 @@ class Service {
 
     const result = await UserModel.create(data);
 
-    // fire event to create cart if role === "customer"
-    if (data.role === ROLES.CUSTOMER) {
-      emitter.emit("user.registered", result._id);
-    }
+    // fire event
+    emitter.emit("user.registered", result._id);
 
     return result;
   }
@@ -149,56 +141,7 @@ class Service {
       );
     }
 
-    // send verification sms with OTP
-    await OTPService.sendVerificationOtp(phone_number);
-  }
-
-  async login(data: ILoginCredentials): Promise<{
-    access_token: string;
-    refresh_token: string;
-    user: IUser;
-  }> {
-    const user = await UserModel.findOne({
-      phone_number: data.phone_number,
-    });
-    if (!user) {
-      throw new ApiError(
-        HttpStatusCode.NOT_FOUND,
-        "The account you are trying to login is not exist our system. Please create account first"
-      );
-    }
-
-    if (user.status === USER_STATUS.INACTIVE) {
-      // send a verification otp
-      await OTPService.sendVerificationOtp(data.phone_number);
-      throw new ApiError(
-        HttpStatusCode.UNAUTHORIZED,
-        "Your account is not verified yet. We've sent a verification otp. Please check SMS & verify to access your account"
-      );
-    }
-
-    if (user.status === USER_STATUS.BANNED) {
-      throw new ApiError(
-        HttpStatusCode.BAD_REQUEST,
-        "Your account has been banned.  You can't access your account. Please contact to support team to activate your account"
-      );
-    }
-
-    const isPasswordMatched = await BcryptInstance.compare(
-      data.password,
-      user.password
-    );
-
-    if (!isPasswordMatched) {
-      throw new ApiError(
-        HttpStatusCode.UNAUTHORIZED,
-        "Invalid credentials. Please try with valid credentials"
-      );
-    }
-
-    await UserModel.findByIdAndUpdate(user._id, { last_login_at: new Date() });
-
-    return await this.generateLoginCredentials(user._id as Types.ObjectId);
+    // send verification link or otp
   }
 
   async getLoggedInUser(id: string) {
@@ -282,17 +225,6 @@ class Service {
     };
   }
 
-  async resetPassword(data: IResetPassword) {
-    const user = await UserModel.findOne({ phone_number: data.phone_number });
-    if (!user) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found!");
-    }
-
-    const newPassword = await BcryptInstance.hash(data.password);
-
-    await UserModel.findByIdAndUpdate(user._id, { password: newPassword });
-  }
-
   async changePassword(id: string, data: IChangePassword) {
     const user = await UserModel.findById(id);
     if (!user) {
@@ -352,17 +284,6 @@ class Service {
     }
 
     return result;
-  }
-
-  async getUserByPhoneNumber(phone_number: string) {
-    const user = await UserModel.findOne({
-      phone_number,
-    });
-    if (!user) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
-    }
-
-    return user;
   }
 
   async getUserByIdWithPassword(id: string | Types.ObjectId) {

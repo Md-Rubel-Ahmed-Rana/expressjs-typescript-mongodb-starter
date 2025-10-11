@@ -48,7 +48,7 @@ class Middleware {
       );
     }
 
-    if (!req.body?.phone_number) {
+    if (!req.body?.email) {
       return next(
         new ApiError(
           HttpStatusCode.BAD_REQUEST,
@@ -72,17 +72,13 @@ class Middleware {
       );
     }
 
-    const isExist = await UserService.getUserByPhoneNumber(
-      req.body?.phone_number
+    const isExist = await UserService.getUserByDynamicKeyValue(
+      "email",
+      req.body?.email
     );
 
     if (isExist) {
-      return next(
-        new ApiError(
-          HttpStatusCode.CONFLICT,
-          "User already exist with this phone number"
-        )
-      );
+      return next(new ApiError(HttpStatusCode.CONFLICT, "User already exist"));
     }
 
     const file = req.file;
