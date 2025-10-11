@@ -1,5 +1,14 @@
 import { Router } from "express";
+import { EmailVerifyOtpController } from "./controller";
+import validateRequest from "@/middlewares/validateRequest";
+import { otpValidations } from "@/modules/otp/otp.validate";
 
 const router = Router();
+
+router.post(
+  "/verify",
+  validateRequest(otpValidations.verifyOtp),
+  EmailVerifyOtpController.verifyOtp
+);
 
 export const EmailVerifyOtpRoutes = router;

@@ -14,7 +14,7 @@ import { userSearchableFields } from "./users.constants";
 import { USER_STATUS } from "./users.enum";
 import { JwtInstance } from "@/lib/jwt";
 import { UUIDService } from "@/lib/uuid";
-import { EmailVerifyLinkService } from "../verification/email/link/service";
+import { EmailVerifyOTPService } from "../verification/email/otp/service";
 
 class Service {
   async create(data: IUser) {
@@ -35,7 +35,12 @@ class Service {
     }
 
     // send verification link or otp
-    await EmailVerifyLinkService.sendVerificationLink({
+    // await EmailVerifyLinkService.sendVerificationLink({
+    //   email: data.email,
+    //   name: data.name,
+    // });
+
+    await EmailVerifyOTPService.sendEmailVerifyOtp({
       email: data.email,
       name: data.name,
     });

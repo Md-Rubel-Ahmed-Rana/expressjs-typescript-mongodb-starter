@@ -48,4 +48,4 @@ class Service {
   }
 }
 
-export const EmailVerifyOTPkService = new Service();
+export const EmailVerifyOTPService = new Service();
