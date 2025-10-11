@@ -15,6 +15,7 @@ export const addressSchema = new Schema<IAddress>(
       lat: { type: Number, default: null },
       lng: { type: Number, default: null },
     },
+    local_address: { type: String, default: null },
   },
   schemaOptions
 );

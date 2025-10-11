@@ -12,4 +12,5 @@ export type IAddress = {
     lat: number;
     lng: number;
   };
+  local_address: string;
 };

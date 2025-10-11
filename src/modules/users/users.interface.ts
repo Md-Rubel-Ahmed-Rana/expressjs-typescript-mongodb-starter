@@ -16,6 +16,7 @@ export type IUser = {
   date_of_birth?: Date;
   gender?: "male" | "female";
   last_login_at?: Date;
+  addresses: Types.ObjectId[];
 } & Document;
 
 type IUserStatus = "inactive" | "active" | "banned";
