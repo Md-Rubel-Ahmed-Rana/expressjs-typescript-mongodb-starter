@@ -16,28 +16,6 @@ class Controller extends BaseController {
     });
   });
 
-  verifyAccount = this.catchAsync(async (req: Request, res: Response) => {
-    const result = await AuthService.verifyAccount(req.body);
-    this.sendResponse(res, {
-      statusCode: HttpStatusCode.OK,
-      success: true,
-      message: "Your account has been verified successfully",
-      data: result,
-    });
-  });
-
-  resendVerificationOtp = this.catchAsync(
-    async (req: Request, res: Response) => {
-      await AuthService.resendVerificationOtp(req.body.phone_number);
-      this.sendResponse(res, {
-        statusCode: HttpStatusCode.OK,
-        success: true,
-        message: "We've sent a verification code to your phone number",
-        data: null,
-      });
-    }
-  );
-
   getLoggedInUser = this.catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.getLoggedInUser(req.user?.id);
     this.sendResponse(res, {
