@@ -26,6 +26,7 @@ const userSchema = new Schema<IUser>(
       default: null,
     },
     last_login_at: { type: Date, default: null },
+    addresses: { type: [Schema.Types.ObjectId], default: [] },
   },
   schemaOptions
 );
