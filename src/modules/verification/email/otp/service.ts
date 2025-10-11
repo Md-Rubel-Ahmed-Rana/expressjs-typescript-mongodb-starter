@@ -13,7 +13,8 @@ class Service {
     console.log(payload);
     // steps analysis
     // 1. generate 6 digit otp and store on DB with dynamically set expired (auto deletion) time
-    const expireDurationMs = 5 * 60; // 5 minutes
+    const expireDurationMs = 5 * 60 * 1000; // 5 minutes in milliseconds
+
     const otp = await OTPService.createOtp(payload.email, expireDurationMs);
     // 2. design the email template
     const htmlContent = verificationEmailOtpTemplate({
@@ -43,6 +44,12 @@ class Service {
     }
 
     await OTPService.verifyOTP(data);
+
+    await UserService.updateUserById(user._id, {
+      status: "active",
+      last_login_at: new Date(),
+      is_verified: true,
+    });
 
     return await AuthService.generateLoginCredentials(user._id);
   }
