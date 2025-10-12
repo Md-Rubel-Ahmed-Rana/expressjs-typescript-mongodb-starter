@@ -14,7 +14,7 @@ import { userSearchableFields } from "./users.constants";
 import { USER_STATUS } from "./users.enum";
 import { JwtInstance } from "@/lib/jwt";
 import { UUIDService } from "@/lib/uuid";
-import { EmailVerifyOTPService } from "../verification/email/otp/service";
+import { PhoneVerifyService } from "../verification/phone/service";
 
 class Service {
   async create(data: IUser) {
@@ -34,16 +34,20 @@ class Service {
       data.username = this.generateUserName(data.email) ?? "";
     }
 
-    // send verification link or otp
+    // send verification link to email
     // await EmailVerifyLinkService.sendVerificationLink({
     //   email: data.email,
     //   name: data.name,
     // });
 
-    await EmailVerifyOTPService.sendEmailVerifyOtp({
-      email: data.email,
-      name: data.name,
-    });
+    // send verification otp to email
+    // await EmailVerifyOTPService.sendEmailVerifyOtp({
+    //   email: data.email,
+    //   name: data.name,
+    // });
+
+    // send verification otp to phone number
+    await PhoneVerifyService.sendPhoneVerifyOtp(data.phone_number);
 
     const result = await UserModel.create(data);
 
