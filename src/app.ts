@@ -6,8 +6,8 @@ import {
   expressMiddlewares,
   notFoundRoutes,
 } from "./middlewares/expressMiddlewares";
-
 import dotenv from "dotenv";
+import "@/config/passport";
 import { initiatePassportSession } from "./config/passportSession";
 dotenv.config();
 
