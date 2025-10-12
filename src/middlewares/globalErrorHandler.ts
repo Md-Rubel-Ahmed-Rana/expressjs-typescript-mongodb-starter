@@ -2,9 +2,10 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { ZodError, ZodIssue } from "zod";
 import mongoose from "mongoose";
-import ApiError, { IGenericErrorMessage } from "./error";
+import ApiError from "./error";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import multer from "multer";
+import { IGenericErrorMessage } from "@/interfaces/common.interface";
 
 class ErrorHandler {
   private statusCode: number = HttpStatusCode.INTERNAL_SERVER_ERROR;

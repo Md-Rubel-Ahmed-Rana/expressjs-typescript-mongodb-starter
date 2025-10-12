@@ -28,3 +28,8 @@ export type ILoginResponse = {
   refresh_token: string;
   user: IUser;
 };
+
+export type IGenericErrorMessage = {
+  path: string | number;
+  message: string;
+};
