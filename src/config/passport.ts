@@ -1,8 +1,6 @@
 import passport from "passport";
-import googleOAuth from "passport-google-oauth20";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { StrategyConfigs } from "@/utils/OAuth";
-
-const GoogleStrategy = googleOAuth.Strategy;
 
 const { google } = StrategyConfigs;
 
@@ -10,6 +8,7 @@ const { google } = StrategyConfigs;
 passport.use(
   new GoogleStrategy(google, (accessToken, refreshToken, profile, done) => {
     try {
+      console.log({ profile });
       const { displayName, emails, photos } = profile;
       if (displayName && emails && photos) {
         const user = {
