@@ -45,7 +45,7 @@ class Service {
       );
     }
 
-    // delete the otp
+    // delete the otp after checked
     await OTPModel.findByIdAndDelete(otpRecord._id);
   }
 
