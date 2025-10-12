@@ -15,6 +15,17 @@ class Controller extends BaseController {
       data: user,
     });
   });
+
+  resendVerifyOtp = this.catchAsync(async (req, res) => {
+    await PhoneVerifyService.resendVerifyOtp(req.body.phone_number);
+    this.sendResponse(res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message:
+        "We've resent a verification code to your phone number. Please verify your account",
+      data: null,
+    });
+  });
 }
 
 export const PhoneVerifyController = new Controller();

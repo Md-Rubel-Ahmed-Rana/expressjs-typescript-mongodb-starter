@@ -43,6 +43,19 @@ class Service {
     // generate login credentials and keep the user as logged in
     return await AuthService.generateLoginCredentials(user._id);
   }
+
+  async resendVerifyOtp(phone_number: string) {
+    // retrieve and check user existence
+    const user = await UserService.getUserByDynamicKeyValue(
+      "phone_number",
+      phone_number
+    );
+    if (!user) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
+    }
+
+    await this.sendPhoneVerifyOtp(phone_number);
+  }
 }
 
 export const PhoneVerifyService = new Service();
