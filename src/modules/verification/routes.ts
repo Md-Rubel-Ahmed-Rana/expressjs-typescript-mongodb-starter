@@ -6,6 +6,6 @@ const router = Router();
 
 router.use("/email", EmailVerifyRoutes);
 
-router.use("/phone", PhoneVerifyRoutes);
+router.use("/phone-number", PhoneVerifyRoutes);
 
 export const VerificationRoutes = router;
