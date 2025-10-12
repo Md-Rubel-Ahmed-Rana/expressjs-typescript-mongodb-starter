@@ -8,7 +8,8 @@ import {
 } from "./middlewares/expressMiddlewares";
 import dotenv from "dotenv";
 import "@/config/passport";
-import { initiatePassportSession } from "./config/passportSession";
+import { initiatePassportSession } from "./middlewares/session";
+
 dotenv.config();
 
 const app: Application = express();
