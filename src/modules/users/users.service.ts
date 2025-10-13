@@ -56,7 +56,7 @@ class Service {
         });
       }
 
-      if (envConfig.app.default_email_verify_method === "opt") {
+      if (envConfig.app.default_email_verify_method === "otp") {
         // send verification otp to email
         await EmailVerifyOTPService.sendEmailVerifyOtp({
           email: data.email,

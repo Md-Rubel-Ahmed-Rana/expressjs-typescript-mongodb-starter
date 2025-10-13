@@ -17,7 +17,7 @@ export const envConfig = {
       process.env.DEFAULT_EMAIL_VERIFY_METHOD as string
     )
       .trim()
-      .toLowerCase() as "link" | "opt",
+      .toLowerCase() as "link" | "otp",
   },
   clients: {
     admin_dev: process.env.ADMIN_CLIENT_URL_DEV as string,

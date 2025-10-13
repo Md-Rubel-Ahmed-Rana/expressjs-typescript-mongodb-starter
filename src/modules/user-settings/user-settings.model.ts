@@ -21,7 +21,7 @@ const userSettingSchema = new Schema<IUserSetting>(
     otp_channel: {
       type: String,
       enum: Object.values(OTP_CHANNEL),
-      default: envConfig.app.default_verification_method,
+      default: envConfig.app.default_verification_method || null,
     },
     email_verify_method: {
       type: String,
