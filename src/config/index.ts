@@ -5,9 +5,15 @@ dotenv.config({ path: path.join(process.cwd(), ".env") });
 
 export const envConfig = {
   app: {
-    port: process.env.PORT ? Number(process.env.PORT) : 5005,
+    port: process.env.PORT ? Number(process.env.PORT) : 5000,
     env: process.env.NODE_ENV as "development" | "production",
     name: process.env.APP_NAME || "Express Modular App",
+    default_verification_method: String(process.env.DEFAULT_VERIFICATION_METHOD)
+      .trim()
+      .toLowerCase() as "email" | "phone",
+    default_email_verify_method: String(process.env.DEFAULT_EMAIL_VERIFY_METHOD)
+      .trim()
+      .toLowerCase() as "link" | "opt",
   },
   clients: {
     admin_dev: process.env.ADMIN_CLIENT_URL_DEV as string,
