@@ -2,11 +2,12 @@ import { model, Schema } from "mongoose";
 import { IUserSetting } from "./user-settings.interface";
 import { schemaOptions } from "@/utils/schemaOptions";
 import {
+  EMAIL_VERIFY_METHOD,
   OTP_CHANNEL,
   PROFILE_VISIBILITY,
   THEME,
-  VERIFICATION_METHOD,
 } from "./user-settings.constants";
+import { envConfig } from "@/config/index";
 
 const userSettingSchema = new Schema<IUserSetting>(
   {
@@ -20,12 +21,15 @@ const userSettingSchema = new Schema<IUserSetting>(
     otp_channel: {
       type: String,
       enum: Object.values(OTP_CHANNEL),
-      default: OTP_CHANNEL.EMAIL,
+      default: envConfig.app.default_verification_method,
     },
-    verification_method: {
+    email_verify_method: {
       type: String,
-      enum: Object.values(VERIFICATION_METHOD),
-      default: VERIFICATION_METHOD.LINK,
+      enum: Object.values(EMAIL_VERIFY_METHOD),
+      default:
+        envConfig.app.default_verification_method === "email"
+          ? (envConfig.app.default_email_verify_method as EMAIL_VERIFY_METHOD)
+          : null,
     },
     notification: {
       email_notifications: { type: Boolean, default: true },

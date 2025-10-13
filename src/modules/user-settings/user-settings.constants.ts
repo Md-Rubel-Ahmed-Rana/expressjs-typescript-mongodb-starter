@@ -1,6 +1,6 @@
 export enum OTP_CHANNEL {
   EMAIL = "email",
-  SMS = "sms",
+  PHONE = "phone",
 }
 
 export enum THEME {
@@ -15,7 +15,7 @@ export enum PROFILE_VISIBILITY {
   FRIEND_ONLY = "friends-only",
 }
 
-export enum VERIFICATION_METHOD {
+export enum EMAIL_VERIFY_METHOD {
   LINK = "link",
   OTP = "otp",
 }
