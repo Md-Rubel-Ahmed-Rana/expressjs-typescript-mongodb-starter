@@ -8,10 +8,14 @@ export const envConfig = {
     port: process.env.PORT ? Number(process.env.PORT) : 5000,
     env: process.env.NODE_ENV as "development" | "production",
     name: process.env.APP_NAME || "Express Modular App",
-    default_verification_method: String(process.env.DEFAULT_VERIFICATION_METHOD)
+    default_verification_method: String(
+      process.env.DEFAULT_VERIFICATION_METHOD as string
+    )
       .trim()
       .toLowerCase() as "email" | "phone",
-    default_email_verify_method: String(process.env.DEFAULT_EMAIL_VERIFY_METHOD)
+    default_email_verify_method: String(
+      process.env.DEFAULT_EMAIL_VERIFY_METHOD as string
+    )
       .trim()
       .toLowerCase() as "link" | "opt",
   },
