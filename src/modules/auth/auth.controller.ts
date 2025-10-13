@@ -9,30 +9,42 @@ class Controller extends BaseController {
   register = this.catchAsync(async (req: Request, res: Response) => {
     await AuthService.register(req.body);
 
-    const isVerificationEnabled = !!envConfig.app.default_verification_method;
+    const verificationMethod = envConfig.app.default_verification_method; // 'phone' | 'email' | undefined
+    const isVerificationEnabled = !!verificationMethod;
 
     let dynamicMessage = "";
+    let verifyData: null | {
+      shouldVerify: boolean;
+      method: "otp" | "link";
+      channel: "email" | "phone";
+    } = null;
 
     if (isVerificationEnabled) {
-      const verificationMethod =
-        envConfig.app.default_verification_method === "phone"
-          ? "phone number"
-          : "email";
+      const isPhoneVerification = verificationMethod === "phone";
 
-      const verifySubMethod =
-        envConfig.app.default_verification_method === "phone"
-          ? "code"
-          : envConfig.app.default_email_verify_method === "otp"
-            ? "code"
-            : "link";
+      const verifySubMethod = isPhoneVerification
+        ? "otp"
+        : envConfig.app.default_email_verify_method === "otp"
+          ? "otp"
+          : "link";
 
-      dynamicMessage = ` We've sent a verification ${verifySubMethod} to your ${verificationMethod}. Please verify your account.`;
+      const displayMethod = isPhoneVerification ? "phone number" : "email";
+      const displaySubMethod = verifySubMethod === "otp" ? "code" : "link";
+
+      dynamicMessage = ` We've sent a verification ${displaySubMethod} to your ${displayMethod}. Please verify your account.`;
+
+      verifyData = {
+        shouldVerify: true,
+        method: verifySubMethod, // 'otp' or 'link'
+        channel: isPhoneVerification ? "phone" : "email",
+      };
     }
 
     this.sendResponse(res, {
       statusCode: HttpStatusCode.CREATED,
       success: true,
       message: `Your account has been created successfully.${dynamicMessage}`,
+      data: verifyData,
     });
   });
 
