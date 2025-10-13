@@ -20,32 +20,6 @@ class Controller extends BaseController {
     });
   });
 
-  verifyAccount = this.catchAsync(async (req: Request, res: Response) => {
-    const result = await UserService.verifyAccount(req.body);
-    // store tokens on cookie
-    // cookieManager.setTokens(res, access_token, refresh_token);
-
-    this.sendResponse(res, {
-      statusCode: HttpStatusCode.OK,
-      success: true,
-      message: "Your account has been verified and logged in successfully",
-      data: result,
-    });
-  });
-
-  resendVerificationOtp = this.catchAsync(
-    async (req: Request, res: Response) => {
-      await UserService.resendVerificationOtp(req.body.phone_number);
-      this.sendResponse(res, {
-        statusCode: HttpStatusCode.OK,
-        success: true,
-        message:
-          " We've sent a verification code (SMS) to you phone number. Please verify to access your account",
-        data: null,
-      });
-    }
-  );
-
   getLoggedInUser = this.catchAsync(async (req: Request, res: Response) => {
     const user = await UserService.getLoggedInUser(req?.user?.id);
     this.sendResponse(res, {

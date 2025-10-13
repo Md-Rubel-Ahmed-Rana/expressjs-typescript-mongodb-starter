@@ -3,8 +3,6 @@ import { IUser, IUserFilters } from "./users.interface";
 import { UserModel } from "./users.model";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import { BcryptInstance } from "@/lib/bcrypt";
-import { OTPService } from "../otp/otp.service";
-import { IOtpVerify } from "../otp/otp.interface";
 import { Types } from "mongoose";
 import { IChangePassword } from "@/interfaces/common.interface";
 import { emitter } from "@/events/eventEmitter";
@@ -15,6 +13,9 @@ import { USER_STATUS } from "./users.enum";
 import { JwtInstance } from "@/lib/jwt";
 import { UUIDService } from "@/lib/uuid";
 import { PhoneVerifyService } from "../verification/phone/service";
+import { envConfig } from "@/config/index";
+import { EmailVerifyLinkService } from "../verification/email/link/service";
+import { EmailVerifyOTPService } from "../verification/email/otp/service";
 
 class Service {
   async create(data: IUser) {
@@ -34,20 +35,35 @@ class Service {
       data.username = this.generateUserName(data.email) ?? "";
     }
 
-    // send verification link to email
-    // await EmailVerifyLinkService.sendVerificationLink({
-    //   email: data.email,
-    //   name: data.name,
-    // });
+    if (envConfig.app.default_verification_method === "phone") {
+      // validate phone number
+      if (!data.phone_number) {
+        throw new ApiError(
+          HttpStatusCode.BAD_REQUEST,
+          "Phone number is required"
+        );
+      }
+      // send verification otp to phone number
+      await PhoneVerifyService.sendPhoneVerifyOtp(data.phone_number);
+    }
 
-    // send verification otp to email
-    // await EmailVerifyOTPService.sendEmailVerifyOtp({
-    //   email: data.email,
-    //   name: data.name,
-    // });
+    if (envConfig.app.default_verification_method === "email") {
+      if (envConfig.app.default_email_verify_method === "link") {
+        // send verification link to email
+        await EmailVerifyLinkService.sendVerificationLink({
+          email: data.email,
+          name: data.name,
+        });
+      }
 
-    // send verification otp to phone number
-    await PhoneVerifyService.sendPhoneVerifyOtp(data.phone_number);
+      if (envConfig.app.default_email_verify_method === "opt") {
+        // send verification otp to email
+        await EmailVerifyOTPService.sendEmailVerifyOtp({
+          email: data.email,
+          name: data.name,
+        });
+      }
+    }
 
     const result = await UserModel.create(data);
 
@@ -78,36 +94,6 @@ class Service {
     emitter.emit("user.registered", result._id);
 
     return result;
-  }
-
-  async verifyAccount(data: IOtpVerify): Promise<{
-    access_token: string;
-    refresh_token: string;
-    user: IUser;
-  }> {
-    const user = await UserModel.findOne({ phone_number: data.credential });
-
-    if (!user) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found!");
-    }
-
-    // prevent already verified account
-    if (user?.status === USER_STATUS.ACTIVE) {
-      throw new ApiError(
-        HttpStatusCode.BAD_REQUEST,
-        "Your account already verified. Please login to your account"
-      );
-    }
-    // verify otp
-    await OTPService.verifyOTP(data);
-
-    // update status to active
-    await UserModel.findByIdAndUpdate(user._id, {
-      status: USER_STATUS.ACTIVE,
-      last_login_at: new Date(),
-    });
-
-    return this.generateLoginCredentials(user._id as Types.ObjectId);
   }
 
   private async generateLoginCredentials(id: Types.ObjectId | string): Promise<{
