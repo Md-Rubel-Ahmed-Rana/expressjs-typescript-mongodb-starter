@@ -8,20 +8,31 @@ import { envConfig } from "@/config/index";
 class Controller extends BaseController {
   register = this.catchAsync(async (req: Request, res: Response) => {
     await AuthService.register(req.body);
-    const verificationMethod =
-      envConfig.app.default_verification_method === "phone"
-        ? "phone number"
-        : "email";
-    const verifySubMethod =
-      envConfig.app.default_verification_method === "phone"
-        ? "code"
-        : envConfig.app.default_email_verify_method === "opt"
+
+    const isVerificationEnabled = !!envConfig.app.default_verification_method;
+
+    let dynamicMessage = "";
+
+    if (isVerificationEnabled) {
+      const verificationMethod =
+        envConfig.app.default_verification_method === "phone"
+          ? "phone number"
+          : "email";
+
+      const verifySubMethod =
+        envConfig.app.default_verification_method === "phone"
           ? "code"
-          : "link";
+          : envConfig.app.default_email_verify_method === "otp"
+            ? "code"
+            : "link";
+
+      dynamicMessage = ` We've sent a verification ${verifySubMethod} to your ${verificationMethod}. Please verify your account.`;
+    }
+
     this.sendResponse(res, {
       statusCode: HttpStatusCode.CREATED,
       success: true,
-      message: `Your account has been created successfully. We've sent a verification ${verifySubMethod} to your ${verificationMethod}. Please verify your account.`,
+      message: `Your account has been created successfully.${dynamicMessage}`,
     });
   });
 
