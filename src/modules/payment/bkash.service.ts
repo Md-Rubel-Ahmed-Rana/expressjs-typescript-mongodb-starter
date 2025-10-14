@@ -2,7 +2,11 @@ import { envConfig } from "@/config/index";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import ApiError from "@/middlewares/error";
 import axios, { AxiosRequestConfig } from "axios";
-import { IBkashCreatePaymentParams, PAYMENT_STATUS } from "./bkash.interface";
+import {
+  IBkashCreatePaymentParams,
+  IBkashRefundPayment,
+  PAYMENT_STATUS,
+} from "./bkash.interface";
 
 class Service {
   // --- bKash URLs ---
@@ -176,6 +180,49 @@ class Service {
       throw new ApiError(
         HttpStatusCode.INTERNAL_SERVER_ERROR,
         `Failed to execute bKash payment: ${error.message}`
+      );
+    }
+  }
+
+  //Refund Payment
+  public async refundPayment(params: IBkashRefundPayment) {
+    try {
+      await this.ensureToken();
+
+      const payload = {
+        paymentID: params.paymentID,
+        trxID: params.trxID,
+        amount: params.amount,
+        sku: params.sku,
+        reason: params.reason || "Customer Request",
+      };
+
+      const config: AxiosRequestConfig = {
+        headers: {
+          Authorization: this.id_token!,
+          "X-APP-Key": this.app_key,
+          "Content-Type": "application/json",
+        },
+      };
+
+      const { data } = await axios.post(
+        this.refund_transaction_url,
+        payload,
+        config
+      );
+
+      if (!data?.transactionStatus) {
+        throw new ApiError(
+          HttpStatusCode.BAD_REQUEST,
+          "Failed to refund bKash payment"
+        );
+      }
+
+      return data;
+    } catch (error: any) {
+      throw new ApiError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        `Failed to refund bKash payment. Error: ${error?.message}`
       );
     }
   }
