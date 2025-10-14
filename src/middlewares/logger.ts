@@ -1,6 +1,7 @@
 import { emitter } from "@/events/eventEmitter";
 import { Request, Response, NextFunction } from "express";
 import { envConfig } from "../config";
+import { TraceService } from "@/lib/trace";
 
 /**
  * Logger Middleware
@@ -8,7 +9,7 @@ import { envConfig } from "../config";
  * Express middleware that logs detailed information about every API request and response.
  *
  * It tracks:
- * - Request method, URL, IP, and input data
+ * - Request method, URL, IP, trace id, and input data
  * - Response output and total execution time (duration)
  * - Emits async log events for further processing or persistence (only in development)
  *
@@ -50,6 +51,7 @@ export const loggerMiddleware = (
     // Collect log data
     const logData = {
       timestamp: new Date().toISOString(),
+      traceId: TraceService.generateAPIRequestTraceId(),
       duration,
       ip: req.ip,
       method: req.method,
