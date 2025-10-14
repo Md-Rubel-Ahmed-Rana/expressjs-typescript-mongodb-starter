@@ -1,5 +1,6 @@
 import { AuthRoutes } from "@/modules/auth/auth.routes";
 import { OTPRoutes } from "@/modules/otp/otp.route";
+import { PaymentRoutes } from "@/modules/payment/payment.routes";
 import { UserSettingPublicRoutes } from "@/modules/user-settings/routes/public.routes";
 import { UserPublicRoutes } from "@/modules/users/routes/public.routes";
 import { VerificationRoutes } from "@/modules/verification/routes";
@@ -27,6 +28,10 @@ const routes = [
   {
     path: "/verification",
     route: VerificationRoutes,
+  },
+  {
+    path: "/payment",
+    route: PaymentRoutes,
   },
 ];
 
