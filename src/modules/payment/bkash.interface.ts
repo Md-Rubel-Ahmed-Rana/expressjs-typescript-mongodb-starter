@@ -11,3 +11,10 @@ export type IBkashRefundPayment = {
   sku: string;
   reason?: string;
 };
+
+export enum PAYMENT_STATUS {
+  PENDING = "pending",
+  PAID = "paid",
+  FAILED = "failed",
+  REFUNDED = "refunded",
+}

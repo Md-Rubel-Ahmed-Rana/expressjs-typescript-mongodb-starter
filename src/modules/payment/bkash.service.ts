@@ -2,7 +2,7 @@ import { envConfig } from "@/config/index";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import ApiError from "@/middlewares/error";
 import axios, { AxiosRequestConfig } from "axios";
-import { IBkashCreatePaymentParams } from "./bkash.interface";
+import { IBkashCreatePaymentParams, PAYMENT_STATUS } from "./bkash.interface";
 
 class Service {
   // --- bKash URLs ---
@@ -121,6 +121,75 @@ class Service {
         HttpStatusCode.INTERNAL_SERVER_ERROR,
         `bKash createPayment failed: ${error.message}`
       );
+    }
+  }
+
+  //Execute Payment
+  public async executePayment(
+    paymentID: string
+  ): Promise<{ status: "success" | "failed" }> {
+    try {
+      await this.ensureToken();
+
+      const payload = { paymentID };
+
+      const config: AxiosRequestConfig = {
+        headers: {
+          Authorization: this.id_token!,
+          "X-APP-Key": this.app_key,
+          "Content-Type": "application/json",
+        },
+      };
+
+      const { data } = await axios.post(
+        this.execute_payment_url,
+        payload,
+        config
+      );
+
+      // 4. Validate response
+      if (!data || !data.trxID || !data.transactionStatus) {
+        throw new ApiError(
+          HttpStatusCode.BAD_REQUEST,
+          "Invalid bKash execute payment response"
+        );
+      }
+
+      const transaction_id: string = data.trxID;
+      const bkashStatus: string = data.transactionStatus;
+      const mappedStatus: PAYMENT_STATUS = this.mapBkashStatus(bkashStatus);
+
+      console.log("Bkash payment callback execution successful", data);
+      // Map to "success" or "failed" for the caller
+      // Map to "success" or "failed" for the caller
+      const resultStatus: "success" | "failed" =
+        mappedStatus === PAYMENT_STATUS.PAID ? "success" : "failed";
+
+      console.log("Bkash payment callback execution successful", {
+        paymentID,
+        transaction_id,
+        bkashStatus,
+      });
+      return { status: resultStatus };
+    } catch (error: any) {
+      console.log(`Failed to execute bKash payment: ${error.message}`, error);
+      throw new ApiError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        `Failed to execute bKash payment: ${error.message}`
+      );
+    }
+  }
+
+  private mapBkashStatus(bkashStatus: string): PAYMENT_STATUS {
+    switch (bkashStatus) {
+      case "Completed":
+        return PAYMENT_STATUS.PAID;
+      case "Failed":
+      case "Cancelled":
+      case "Timeout":
+        return PAYMENT_STATUS.FAILED;
+      default:
+        return PAYMENT_STATUS.PENDING;
     }
   }
 }
