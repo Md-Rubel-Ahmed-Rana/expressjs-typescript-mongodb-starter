@@ -5,6 +5,7 @@ import cors from "cors";
 import morgan from "morgan";
 import { corsOptions } from "@/config/corsOptions";
 import { loggerMiddleware } from "./logger";
+import { HttpStatusCode } from "@/lib/httpStatus";
 
 export const expressMiddlewares = (app: Application) => {
   app.use(cors(corsOptions));
@@ -22,13 +23,14 @@ export const expressMiddlewares = (app: Application) => {
 export const notFoundRoutes = (app: Application) => {
   app.use((req: Request, res: Response, next: NextFunction) => {
     console.log(`User hit: '${req.originalUrl}' is not exist`);
-    res.status(404).json({
+    res.status(HttpStatusCode.NOT_FOUND).json({
+      statusCode: HttpStatusCode.NOT_FOUND,
       success: false,
-      message: "Not Found",
+      message: "Resource not found.",
       errorMessages: [
         {
           path: req.originalUrl,
-          message: "API Not Found",
+          message: "The requested API endpoint does not exist.",
         },
       ],
     });
