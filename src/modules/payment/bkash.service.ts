@@ -2,6 +2,7 @@ import { envConfig } from "@/config/index";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import ApiError from "@/middlewares/error";
 import axios, { AxiosRequestConfig } from "axios";
+import { IBkashCreatePaymentParams } from "./bkash.interface";
 
 class Service {
   // --- bKash URLs ---
@@ -66,6 +67,59 @@ class Service {
       throw new ApiError(
         HttpStatusCode.INTERNAL_SERVER_ERROR,
         `bKash grantToken failed: ${error?.message}`
+      );
+    }
+  }
+
+  //  Create Payment
+  public async createPayment(
+    params: IBkashCreatePaymentParams
+  ): Promise<{ payment_id: string; payment_url: string }> {
+    try {
+      await this.ensureToken();
+
+      const payload = {
+        mode: "0011",
+        payerReference: " ",
+        callbackURL: this.callback_url,
+        amount: params.payable_amount.toFixed(),
+        currency: "BDT",
+        intent: params.intent || "sale",
+        merchantInvoiceNumber: params.invoice_number,
+      };
+
+      console.log(payload);
+
+      const config: AxiosRequestConfig = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: this.id_token!,
+          Accept: "application/json",
+          "X-APP-key": this.app_key,
+        },
+      };
+
+      const { data } = await axios.post(
+        this.create_payment_url,
+        payload,
+        config
+      );
+
+      if (!data?.paymentID) {
+        throw new ApiError(
+          HttpStatusCode.BAD_REQUEST,
+          "Failed to place order or payment initiate. Please try again"
+        );
+      }
+
+      console.log("Payment has successfully", data);
+
+      return { payment_id: data.paymentID, payment_url: data.bkashURL };
+    } catch (error: any) {
+      console.log("Create payment failed", error);
+      throw new ApiError(
+        HttpStatusCode.INTERNAL_SERVER_ERROR,
+        `bKash createPayment failed: ${error.message}`
       );
     }
   }
