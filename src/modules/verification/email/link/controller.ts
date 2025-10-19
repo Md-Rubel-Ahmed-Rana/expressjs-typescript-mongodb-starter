@@ -38,6 +38,16 @@ class Controller extends BaseController {
       data: user,
     });
   });
+
+  verifyForgetPasswordToken = this.catchAsync(async (req, res) => {
+    await EmailVerifyLinkService.verifyForgetPasswordToken(req.body.token);
+    this.sendResponse(res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "Forget password token verified",
+      data: null,
+    });
+  });
 }
 
 export const EmailVerifyLinkController = new Controller();

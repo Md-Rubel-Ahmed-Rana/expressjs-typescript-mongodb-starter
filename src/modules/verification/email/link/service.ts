@@ -150,6 +150,10 @@ class Service {
   async verify2FAAuthToken(token: string) {
     return this.verifyTokenFromLink(token);
   }
+
+  async verifyForgetPasswordToken(token: string) {
+    return this.verifyTokenFromLink(token);
+  }
 }
 
 export const EmailVerifyLinkService = new Service();
