@@ -146,6 +146,10 @@ class Service {
       result,
     });
   }
+
+  async verify2FAAuthToken(token: string) {
+    return this.verifyTokenFromLink(token);
+  }
 }
 
 export const EmailVerifyLinkService = new Service();
