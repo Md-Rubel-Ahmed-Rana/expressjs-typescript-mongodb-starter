@@ -9,4 +9,9 @@ router.post("/resend", EmailVerifyLinkController.resendVerificationLink);
 
 router.post("/2fa", EmailVerifyLinkController.verify2FAAuthToken);
 
+router.post(
+  "/forget-password",
+  EmailVerifyLinkController.verifyForgetPasswordToken
+);
+
 export const EmailVerifyLinkRoutes = router;
