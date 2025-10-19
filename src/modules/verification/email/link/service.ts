@@ -83,6 +83,9 @@ class Service {
 
     return await AuthService.generateLoginCredentials(user._id);
   }
+  async sendForgetPasswordLink(email: string) {
+    console.log(email);
+  }
 }
 
 export const EmailVerifyLinkService = new Service();
