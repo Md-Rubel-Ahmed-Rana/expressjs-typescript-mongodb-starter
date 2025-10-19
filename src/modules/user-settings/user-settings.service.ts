@@ -1,5 +1,8 @@
 import { Types } from "mongoose";
 import { UserSettingModel } from "./user-settings.model";
+import { IEmailVerifyMethod, IOtpChannel } from "./user-settings.interface";
+import ApiError from "@/middlewares/error";
+import { HttpStatusCode } from "@/lib/httpStatus";
 
 class Service {
   // this is from event fire
@@ -15,7 +18,26 @@ class Service {
 
   // get setting by user id for a user
   async getMySettings(user_id: Types.ObjectId | string) {
-    return await UserSettingModel.findById(user_id);
+    return await UserSettingModel.findOne({ user: user_id });
+  }
+
+  async getUserOtpChannelInfo(user_id: Types.ObjectId | string): Promise<{
+    channel: IOtpChannel;
+    email_method: IEmailVerifyMethod;
+  }> {
+    const settings = await UserSettingModel.findOne({ user: user_id });
+
+    if (!settings) {
+      throw new ApiError(
+        HttpStatusCode.NOT_FOUND,
+        "User settings was not found"
+      );
+    }
+
+    return {
+      channel: settings.otp_channel,
+      email_method: settings.email_verify_method,
+    };
   }
 }
 

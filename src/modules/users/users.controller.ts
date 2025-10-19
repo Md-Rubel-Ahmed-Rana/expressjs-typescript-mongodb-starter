@@ -10,16 +10,6 @@ import { IUserFilters } from "./users.interface";
 import { Types } from "mongoose";
 
 class Controller extends BaseController {
-  createUserByAdmin = this.catchAsync(async (req: Request, res: Response) => {
-    const result = await UserService.createUserByAdmin(req.body);
-    this.sendResponse(res, {
-      statusCode: HttpStatusCode.CREATED,
-      success: true,
-      message: "Your account has been created successfully.",
-      data: result,
-    });
-  });
-
   getLoggedInUser = this.catchAsync(async (req: Request, res: Response) => {
     const user = await UserService.getLoggedInUser(req?.user?.id);
     this.sendResponse(res, {
