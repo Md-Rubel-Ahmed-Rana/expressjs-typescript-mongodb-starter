@@ -26,6 +26,18 @@ class Controller extends BaseController {
       data: null,
     });
   });
+
+  verify2FAAuthToken = this.catchAsync(async (req, res) => {
+    const { access_token, refresh_token, user } =
+      await EmailVerifyLinkService.verify2FAAuthToken(req.body.token);
+    cookieManager.setTokens(res, access_token, refresh_token);
+    this.sendResponse(res, {
+      statusCode: HttpStatusCode.OK,
+      success: true,
+      message: "2FA Verification and logged in successful",
+      data: user,
+    });
+  });
 }
 
 export const EmailVerifyLinkController = new Controller();
