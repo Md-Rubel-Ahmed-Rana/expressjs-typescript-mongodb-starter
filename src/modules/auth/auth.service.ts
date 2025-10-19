@@ -81,6 +81,17 @@ class Service {
         dynamicMessage = `Two-factor authentication is enabled. We've sent a verification ${displaySubMethod} to your ${displayMethod}. Please complete the verification to continue.`;
         // send 2FA verification email or otp
 
+        if (channel === "email") {
+          if (email_method === "link") {
+            // send forget password link
+            await EmailVerifyLinkService.send2FALoginAuthEmailLink(user?.email);
+          } else if (email_method === "otp") {
+            // send forget password otp
+          }
+        } else if (channel === "phone") {
+          // send forget password otp SMS
+        }
+
         return {
           is2FAEnabled,
           message: dynamicMessage,
