@@ -185,3 +185,54 @@ export const forgetPasswordEmailLinkTemplate = (payload: {
   </html>
   `;
 };
+
+export const login2FAAuthEmailLinkTemplate = (payload: {
+  name: string;
+  link: string;
+}) => {
+  const { name, link } = payload;
+
+  return `
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Two-Factor Authentication</title>
+      <style>
+        .btn:hover {
+          background-color: #1d4ed8;
+        }
+        a.link {
+          color: #2563eb;
+          word-break: break-all;
+        }
+      </style>
+    </head>
+    <body style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;background-color: #f4f6f8;margin: 0;padding: 0;">
+      <div style=" max-width: 600px;margin: 40px auto;background: #ffffff;border-radius: 12px;box-shadow: 0 2px 8px rgba(0,0,0,0.05);overflow: hidden;" class="container">
+        <div style=" background-color: #2563eb;color: #ffffff;text-align: center;padding: 30px 20px;" class="header">
+          <h1 style="margin: 0;font-size: 22px;letter-spacing: 0.5px;">Two-Factor Authentication</h1>
+        </div>
+        <div style="padding: 30px 40px;color: #333333;line-height: 1.6;" class="content">
+          <p style="margin: 12px 0;font-size: 15px;">Hi ${name || "there"},</p>
+          <p style="margin: 12px 0;font-size: 15px;">We noticed a login attempt to your account that requires two-factor authentication (2FA).</p>
+          <p style="margin: 12px 0;font-size: 15px;">Please click the button below to verify your identity and complete your login:</p>
+
+          <div style="text-align: center;margin: 30px 0;" class="btn-container">
+            <a style="background-color: #2563eb;color: #ffffff !important;text-decoration: none;padding: 12px 28px;border-radius: 6px;font-weight: 600;display: inline-block;transition: background-color 0.2s ease;" href="${link}" target="_blank" class="btn">Verify Login</a>
+          </div>
+
+          <p style="margin: 12px 0;font-size: 15px;">If the button above doesn't work, you can also use the link below:</p>
+          <p style="margin: 12px 0;font-size: 15px;"><a href="${link}" class="link" target="_blank">${link}</a></p>
+
+          <p style="margin: 12px 0;font-size: 15px;">If you did not attempt to log in, please secure your account immediately by changing your password.</p>
+        </div>
+        <div style=" background-color: #f9fafb;text-align: center;padding: 20px;font-size: 13px;color: #777777;" class="footer">
+          <p>© ${new Date().getFullYear()} Your Restaurant. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+  </html>
+  `;
+};
