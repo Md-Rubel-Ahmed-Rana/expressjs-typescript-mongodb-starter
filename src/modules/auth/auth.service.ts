@@ -2,6 +2,7 @@ import { BcryptInstance } from "@/lib/bcrypt";
 import { IUser } from "../users/users.interface";
 import { UserService } from "../users/users.service";
 import {
+  I2FALoginResponse,
   IChangePassword,
   ILoginCredentials,
   ILoginResponse,
@@ -22,24 +23,18 @@ class Service {
     await UserService.create(data);
   }
 
-  async login(data: ILoginCredentials): Promise<{
-    access_token: string;
-    refresh_token: string;
-    user: IUser;
-  }> {
-    const user = await UserService.getUserByDynamicKeyValue(
-      "email",
-      data.email
-    );
+  async login(
+    data: ILoginCredentials
+  ): Promise<ILoginResponse | I2FALoginResponse> {
+    const user = await UserService.getUserByEmailOrPhoneNumber(data.credential);
     if (!user) {
       throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
     }
     if (user.status === USER_STATUS.INACTIVE) {
       // send a verification link or otp
-
       throw new ApiError(
         HttpStatusCode.UNAUTHORIZED,
-        "Your account is not activated yet. We've sent a verification otp. Please check SMS & verify to access your account"
+        "Your account is not activated yet. Please activate your account first"
       );
     }
 
@@ -60,6 +55,42 @@ class Service {
         HttpStatusCode.UNAUTHORIZED,
         "Invalid credentials. Please try with valid credentials"
       );
+    }
+
+    const is2FAEnabled = await UserSettingService.is2FAEnabled(user._id);
+
+    if (is2FAEnabled) {
+      const { channel, email_method } =
+        await UserSettingService.getUserOtpChannelInfo(user._id);
+
+      const verificationMethod = channel;
+      const isVerificationEnabled = !!verificationMethod;
+      let dynamicMessage = "";
+      if (isVerificationEnabled) {
+        const isPhoneVerification = verificationMethod === "phone";
+
+        const verifySubMethod = isPhoneVerification
+          ? "otp"
+          : email_method === "otp"
+            ? "otp"
+            : "link";
+
+        const displayMethod = isPhoneVerification ? "phone number" : "email";
+        const displaySubMethod = verifySubMethod === "otp" ? "code" : "link";
+
+        dynamicMessage = `Two-factor authentication is enabled. We've sent a verification ${displaySubMethod} to your ${displayMethod}. Please complete the verification to continue.`;
+        // send 2FA verification email or otp
+
+        return {
+          is2FAEnabled,
+          message: dynamicMessage,
+          data: {
+            shouldVerify: true,
+            method: verifySubMethod, // 'otp' or 'link'
+            channel: isPhoneVerification ? "phone" : "email",
+          },
+        };
+      }
     }
 
     await UserService.updateUserById(user._id as Types.ObjectId, {
@@ -141,6 +172,24 @@ class Service {
     const { channel, email_method } =
       await UserSettingService.getUserOtpChannelInfo(user._id);
 
+    const verificationMethod = channel;
+    const isVerificationEnabled = !!verificationMethod;
+    let dynamicMessage = "";
+    if (isVerificationEnabled) {
+      const isPhoneVerification = verificationMethod === "phone";
+
+      const verifySubMethod = isPhoneVerification
+        ? "otp"
+        : email_method === "otp"
+          ? "otp"
+          : "link";
+
+      const displayMethod = isPhoneVerification ? "phone number" : "email";
+      const displaySubMethod = verifySubMethod === "otp" ? "code" : "link";
+
+      dynamicMessage = `We've sent a verification ${displaySubMethod} to your ${displayMethod}.`;
+    }
+
     if (channel === "email") {
       if (email_method === "link") {
         // send forget password link
@@ -151,6 +200,8 @@ class Service {
     } else if (channel === "phone") {
       // send forget password otp SMS
     }
+
+    return { dynamicMessage };
   }
 
   async generateLoginCredentials(

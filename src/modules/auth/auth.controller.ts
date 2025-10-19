@@ -4,6 +4,10 @@ import { AuthService } from "./auth.service";
 import { HttpStatusCode } from "@/lib/httpStatus";
 import { cookieManager } from "@/shared/cookie";
 import { envConfig } from "@/config/index";
+import {
+  I2FALoginResponse,
+  ILoginResponse,
+} from "@/interfaces/common.interface";
 
 class Controller extends BaseController {
   register = this.catchAsync(async (req: Request, res: Response) => {
@@ -59,24 +63,9 @@ class Controller extends BaseController {
   });
 
   forgetPassword = this.catchAsync(async (req: Request, res: Response) => {
-    const verificationMethod = envConfig.app.default_verification_method; // 'phone' | 'email' | undefined
-    const isVerificationEnabled = !!verificationMethod;
-    let dynamicMessage = "";
-    if (isVerificationEnabled) {
-      const isPhoneVerification = verificationMethod === "phone";
-
-      const verifySubMethod = isPhoneVerification
-        ? "otp"
-        : envConfig.app.default_email_verify_method === "otp"
-          ? "otp"
-          : "link";
-
-      const displayMethod = isPhoneVerification ? "phone number" : "email";
-      const displaySubMethod = verifySubMethod === "otp" ? "code" : "link";
-
-      dynamicMessage = `We've sent a verification ${displaySubMethod} to your ${displayMethod}.`;
-    }
-    await AuthService.forgetPassword(req.body.credential);
+    const { dynamicMessage } = await AuthService.forgetPassword(
+      req.body.credential
+    );
     this.sendResponse(res, {
       statusCode: HttpStatusCode.OK,
       success: true,
@@ -96,9 +85,20 @@ class Controller extends BaseController {
   });
 
   login = this.catchAsync(async (req: Request, res: Response) => {
-    const { access_token, refresh_token, user } = await AuthService.login(
-      req.body
-    );
+    const data: any = await AuthService.login(req.body);
+
+    if (data?.is2FAEnabled) {
+      const { message, data: verifyData } = data as I2FALoginResponse;
+
+      return this.sendResponse(res, {
+        statusCode: HttpStatusCode.OK,
+        success: true,
+        message,
+        data: verifyData,
+      });
+    }
+
+    const { access_token, refresh_token, user } = data as ILoginResponse;
     cookieManager.setTokens(res, access_token, refresh_token);
     this.sendResponse(res, {
       statusCode: HttpStatusCode.OK,
