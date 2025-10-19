@@ -10,7 +10,6 @@ import { IPaginationOptions } from "@/interfaces/pagination.interfaces";
 import { paginationHelpers } from "@/helpers/paginationHelpers";
 import { userSearchableFields } from "./users.constants";
 import { USER_STATUS } from "./users.enum";
-import { JwtInstance } from "@/lib/jwt";
 import { UUIDService } from "@/lib/uuid";
 import { PhoneVerifyService } from "../verification/phone/service";
 import { envConfig } from "@/config/index";
@@ -71,77 +70,6 @@ class Service {
     emitter.emit("user.registered", result._id);
 
     return result;
-  }
-
-  async createUserByAdmin(data: IUser) {
-    const isExist = await UserModel.findOne({
-      phone_number: data.phone_number,
-    });
-
-    if (isExist) {
-      throw new ApiError(
-        HttpStatusCode.CONFLICT,
-        `User already have an account with this phone number. Please use a different phone number to create account.`
-      );
-    }
-
-    data.is_verified = true;
-    data.status = USER_STATUS.ACTIVE;
-
-    const result = await UserModel.create(data);
-
-    // fire event
-    emitter.emit("user.registered", result._id);
-
-    return result;
-  }
-
-  private async generateLoginCredentials(id: Types.ObjectId | string): Promise<{
-    access_token: string;
-    refresh_token: string;
-    user: IUser;
-  }> {
-    const user: any = await UserModel.findById(id).select({
-      password: 0,
-    });
-
-    if (!user) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
-    }
-
-    const payload: any = {
-      id: user?._id.toString(),
-      phone_number: user?.phone_number as string,
-      role: user?.role as string,
-    };
-    const { access_token, refresh_token } =
-      await JwtInstance.generateTokens(payload);
-
-    return {
-      user: user,
-      access_token,
-      refresh_token,
-    };
-  }
-
-  async resendVerificationOtp(phone_number: string) {
-    const user = await UserModel.findOne({
-      phone_number,
-    });
-
-    if (!user) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found!");
-    }
-
-    // prevent already verified account
-    if (user?.status === USER_STATUS.ACTIVE) {
-      throw new ApiError(
-        HttpStatusCode.BAD_REQUEST,
-        "Your account already verified. Please login to your account"
-      );
-    }
-
-    // send verification link or otp
   }
 
   async getLoggedInUser(id: string) {
@@ -307,6 +235,12 @@ class Service {
     value: string | number
   ): Promise<IUser | null> {
     return await UserModel.findOne({ [key]: value });
+  }
+
+  async getUserByEmailOrPhoneNumber(credential: string) {
+    return await UserModel.findOne({
+      $or: [{ phone_number: credential }, { email: credential }],
+    });
   }
 
   async updateUserById(id: string | Types.ObjectId, data: Partial<IUser>) {

@@ -8,12 +8,12 @@ import {
   IResetPassword,
 } from "@/interfaces/common.interface";
 import { USER_STATUS } from "../users/users.enum";
-import { OTPService } from "../otp/otp.service";
 import ApiError from "@/middlewares/error";
 import { Types } from "mongoose";
-import { IOtpVerify } from "../otp/otp.interface";
 import { JwtInstance } from "@/lib/jwt";
 import { HttpStatusCode } from "@/lib/httpStatus";
+import { UserSettingService } from "../user-settings/user-settings.service";
+import { EmailVerifyLinkService } from "../verification/email/link/service";
 
 class Service {
   async register(data: IUser) {
@@ -69,40 +69,6 @@ class Service {
     return await this.generateLoginCredentials(user._id as Types.ObjectId);
   }
 
-  async verifyAccount(data: IOtpVerify): Promise<{
-    access_token: string;
-    refresh_token: string;
-    user: IUser;
-  }> {
-    const user = await UserService.getUserByDynamicKeyValue(
-      "email",
-      data.credential
-    );
-
-    if (!user) {
-      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
-    }
-
-    // prevent already verified account
-    if (user?.status === USER_STATUS.ACTIVE) {
-      throw new ApiError(
-        HttpStatusCode.BAD_REQUEST,
-        "Your account already verified. Please login to your account"
-      );
-    }
-    // verify otp
-    await OTPService.verifyOTP(data);
-
-    // update status to active
-    await UserService.updateUserById(user._id as Types.ObjectId, {
-      status: USER_STATUS.ACTIVE,
-      last_login_at: new Date(),
-      is_verified: true,
-    });
-
-    return this.generateLoginCredentials(user._id as Types.ObjectId);
-  }
-
   async getLoggedInUser(id: string) {
     const user = await UserService.getUserByIdWithoutPassword(id);
 
@@ -113,12 +79,6 @@ class Service {
       );
     }
     return user;
-  }
-
-  async resendVerificationOtp(phone_number: string) {
-    // await UserService.getUserByPhoneNumber(phone_number);
-    // send verification link or otp
-    console.log(phone_number);
   }
 
   async resetPassword(data: IResetPassword) {
@@ -171,10 +131,26 @@ class Service {
     await UserService.updateUserById(user._id, { password: newPassword });
   }
 
-  async forgetPassword(phone_number: string) {
-    await UserService.getUserByDynamicKeyValue("phone_number", phone_number);
+  async forgetPassword(credential: string) {
+    const user = await UserService.getUserByEmailOrPhoneNumber(credential);
 
-    await OTPService.sendForgetPasswordOtp(phone_number);
+    if (!user) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
+    }
+
+    const { channel, email_method } =
+      await UserSettingService.getUserOtpChannelInfo(user._id);
+
+    if (channel === "email") {
+      if (email_method === "link") {
+        // send forget password link
+        await EmailVerifyLinkService.sendForgetPasswordLink(user?.email);
+      } else if (email_method === "otp") {
+        // send forget password otp
+      }
+    } else if (channel === "phone") {
+      // send forget password otp SMS
+    }
   }
 
   async generateLoginCredentials(

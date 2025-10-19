@@ -59,11 +59,28 @@ class Controller extends BaseController {
   });
 
   forgetPassword = this.catchAsync(async (req: Request, res: Response) => {
-    await AuthService.forgetPassword(req.body.phone_number);
+    const verificationMethod = envConfig.app.default_verification_method; // 'phone' | 'email' | undefined
+    const isVerificationEnabled = !!verificationMethod;
+    let dynamicMessage = "";
+    if (isVerificationEnabled) {
+      const isPhoneVerification = verificationMethod === "phone";
+
+      const verifySubMethod = isPhoneVerification
+        ? "otp"
+        : envConfig.app.default_email_verify_method === "otp"
+          ? "otp"
+          : "link";
+
+      const displayMethod = isPhoneVerification ? "phone number" : "email";
+      const displaySubMethod = verifySubMethod === "otp" ? "code" : "link";
+
+      dynamicMessage = `We've sent a verification ${displaySubMethod} to your ${displayMethod}.`;
+    }
+    await AuthService.forgetPassword(req.body.credential);
     this.sendResponse(res, {
       statusCode: HttpStatusCode.OK,
       success: true,
-      message: "We've sent a verification code to your phone number",
+      message: dynamicMessage,
       data: null,
     });
   });
