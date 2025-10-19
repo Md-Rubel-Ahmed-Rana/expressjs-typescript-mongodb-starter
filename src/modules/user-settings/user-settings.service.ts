@@ -39,6 +39,18 @@ class Service {
       email_method: settings.email_verify_method,
     };
   }
+
+  async is2FAEnabled(user_id: Types.ObjectId | string): Promise<boolean> {
+    const settings = await UserSettingModel.findOne({ user: user_id });
+    if (!settings) {
+      throw new ApiError(
+        HttpStatusCode.NOT_FOUND,
+        "User settings was not found"
+      );
+    }
+
+    return settings.privacy.two_factor_auth_enabled;
+  }
 }
 
 export const UserSettingService = new Service();

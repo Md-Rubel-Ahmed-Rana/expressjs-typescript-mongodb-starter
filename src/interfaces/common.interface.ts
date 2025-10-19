@@ -14,7 +14,7 @@ export type IChangePassword = {
 };
 
 export type ILoginCredentials = {
-  email: string;
+  credential: string;
   password: string;
 };
 
@@ -27,6 +27,16 @@ export type ILoginResponse = {
   access_token: string;
   refresh_token: string;
   user: IUser;
+};
+
+export type I2FALoginResponse = {
+  is2FAEnabled: boolean;
+  message: string;
+  data: {
+    shouldVerify: boolean;
+    channel: "email" | "phone";
+    method: "otp" | "link";
+  };
 };
 
 export type IGenericErrorMessage = {
