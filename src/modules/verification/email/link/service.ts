@@ -6,7 +6,10 @@ import { JwtInstance } from "@/lib/jwt";
 import ApiError from "@/middlewares/error";
 import { AuthService } from "@/modules/auth/auth.service";
 import { UserService } from "@/modules/users/users.service";
-import { verificationEmailTemplate } from "@/templates/email/verification-template";
+import {
+  forgetPasswordEmailLinkTemplate,
+  verificationEmailTemplate,
+} from "@/templates/email/verification-template";
 import { Types } from "mongoose";
 
 class Service {
@@ -83,8 +86,37 @@ class Service {
 
     return await AuthService.generateLoginCredentials(user._id);
   }
+
   async sendForgetPasswordLink(email: string) {
-    console.log(email);
+    const user = await UserService.getUserByDynamicKeyValue("email", email);
+    if (!user) {
+      throw new ApiError(HttpStatusCode.NOT_FOUND, "User was not found");
+    }
+
+    // generate jwt token
+    const token = await JwtInstance.generateEmailVerificationToken({
+      name: user?.name,
+      email: user?.email,
+      id: user?._id,
+    });
+    const domain =
+      envConfig.app.env === "production"
+        ? envConfig.clients.public_prod
+        : envConfig.clients.public_dev;
+    const link = `${domain}/auth/reset-password/${token}`;
+
+    const htmlContent = forgetPasswordEmailLinkTemplate({
+      name: user?.name,
+      link,
+    });
+
+    // 4. send email to the user mailbox
+    const subject = `Reset Your Password`;
+    const result = await MailService.sendEmail(subject, email, htmlContent);
+    console.log({
+      message: `Reset Password email has been sent to ${email}`,
+      result,
+    });
   }
 }
 
