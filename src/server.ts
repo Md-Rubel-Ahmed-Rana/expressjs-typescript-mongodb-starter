@@ -8,12 +8,13 @@ process.on("uncaughtException", (error) => {
   console.error(`Uncaught Exception: ${error.message}`, { stack: error.stack });
   process.exit(1);
 });
-
+// create http server for future usages
 let server: Server;
 const port = envConfig.app.port;
 
 async function main() {
   try {
+    // connect database first
     await mongodbConnection();
     await redisClient();
     server = app.listen(port, async () => {
