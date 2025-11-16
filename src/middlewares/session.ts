@@ -21,10 +21,10 @@ export const initiatePassportSession = (app: Application) => {
         secure: envConfig.app.env === "production" ? true : false,
         maxAge: 1000 * 60 * 60 * 24,
       },
-    })
+    }) as any
   );
 
-  app.use(passport.initialize());
+  app.use(passport.initialize() as any);
   app.use(passport.session());
 
   passport.serializeUser((user, done) => done(null, user));
